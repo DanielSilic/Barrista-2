@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Kaffeesorte {
 
-    private String Id;
     private String KaffeesorteName;
     private String RoestereiName;
     private String Variety;

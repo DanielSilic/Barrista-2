@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Zubereitungsmethode {
 
-    private String Id;
     private String ZubereitungsmethodeName;
     private String Barrista;
     private String MethodenType;

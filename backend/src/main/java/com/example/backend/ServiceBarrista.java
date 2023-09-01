@@ -58,7 +58,6 @@ public class ServiceBarrista {
         return tastingRepo.findByBewertung(Bewertung);
     }
 
-    //Tastings nach Bewertung
     public List<Tasting> getTastingsByBewertung(String bewertungFrontend) {
         int start, end;
 
@@ -85,8 +84,6 @@ public class ServiceBarrista {
 
         return tastingRepo.findByBewertungBetween(start, end);
     }
-
-
 
     //getFilter für Filter-Dropdowns
 
@@ -133,8 +130,6 @@ public class ServiceBarrista {
                 .distinct()
                 .collect(Collectors.toList());
     }
-
-
 
 
 }

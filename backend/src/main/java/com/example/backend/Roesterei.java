@@ -11,10 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Roesterei {
 
-    private String Id;
     private String RoestereiName;
     private String RoestereiBeschreibung;
     private String FotoUrlRoesterei;
-    private List<Kaffeesorte> kaffeesorten;
 
 }

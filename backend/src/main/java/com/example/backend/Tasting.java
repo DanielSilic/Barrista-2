@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Tasting {
 
-    private String Id;
     private String TastingName;
     private String KaffeeSorteName;
     private String ZubereitungsmethodeName;
