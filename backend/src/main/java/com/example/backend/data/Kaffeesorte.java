@@ -1,14 +1,17 @@
-package com.example.backend;
+package com.example.backend.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Kaffeesorte {
 
+    @Id
+    private String Id;
     private String KaffeesorteName;
     private String RoestereiName;
     private String Variety;
