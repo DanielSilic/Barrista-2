@@ -10,10 +10,7 @@ import java.util.Optional;
 @Repository
 public interface KaffeesorteRepo extends MongoRepository<Kaffeesorte,String> {
 
-    List<Kaffeesorte> findByRoestereiName(String RoestereiName);
-    List<Kaffeesorte> findByAromenprofil(String Aromenprofil);
-    List<Kaffeesorte> findByVariety(String Variety);
-    Optional<Kaffeesorte> findByKaffeesorteName(String KaffeesorteName);
+    Optional<Kaffeesorte> findByKaffeesorteName(String kaffeesorteName);
     Optional<Kaffeesorte> findByKaffeesorteNameAndRoestereiName(String kaffeesorteName, String roestereiName);
-    void deleteByKaffeesorteName(String kaffeesorteName);
+    void deleteByKaffeesorteName(String KaffeesorteName);
 }

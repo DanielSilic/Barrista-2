@@ -47,55 +47,62 @@ public class ServiceBarrista {
     //filterbyX für gefilterte Listen
 
     //Kaffeesorten
-    public List<Kaffeesorte> filterKaffeesorten(@Nullable String RoestereiName, @Nullable String Aromenprofil) {
+    public List<Kaffeesorte> filterKaffeesorten(@Nullable String roestereiName, @Nullable String aromenProfil) {
         List<Kaffeesorte> allKaffeesorten = kaffeesorteRepo.findAll();
 
         return allKaffeesorten.stream()
-                .filter(kaffeesorte -> (RoestereiName == null || kaffeesorte.getRoestereiName().equals(RoestereiName))
-                        && (Aromenprofil == null || kaffeesorte.getAromenprofil().equals(Aromenprofil)))
+                .filter(kaffeesorte -> (roestereiName == null || kaffeesorte.getRoestereiName().equals(roestereiName))
+                        && (aromenProfil == null || kaffeesorte.getAromenProfil().equals(aromenProfil)))
                 .collect(Collectors.toList());
     }
 
     //Zubereitungsmethoden
-    public List<Zubereitungsmethode> filterbyMethodenType (String MethodenType){
-        return zubereitungsmethodeRepo.findByMethodenType(MethodenType);
+    public List<Zubereitungsmethode> filterbyMethodenType (String methodenType){
+        return zubereitungsmethodeRepo.findByMethodenType(methodenType);
     }
 
     //Tastings
 
-    public List<Tasting> filterTastings(@Nullable String zubereitungsmethodeName, @Nullable String kaffeeSorteName, @Nullable String bewertungFrontend) {
+    public List<Tasting> filterTastings(@Nullable String zubereitungsmethodeName,
+                                        @Nullable String kaffeesorteName,
+                                        @Nullable String bewertungFrontend) {
+
         List<Tasting> allTastings = tastingRepo.findAll();
 
-        int startBewertung, endBewertung;
+        int startBewertung;
+        int endBewertung;
 
-        switch (bewertungFrontend.toLowerCase()) {
-            case "schlecht":
-                startBewertung = 1;
-                endBewertung = 3;
-                break;
-            case "mittel":
-                startBewertung = 4;
-                endBewertung = 6;
-                break;
-            case "gut":
-                startBewertung = 7;
-                endBewertung = 9;
-                break;
-            case "top":
-                startBewertung = 10;
-                endBewertung = 10;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid Bewertungsangabe: " + bewertungFrontend);
+        if(bewertungFrontend != null) {
+            switch (bewertungFrontend) {
+                case "schlecht" -> {
+                    startBewertung = 1;
+                    endBewertung = 3;
+                }
+                case "mittel" -> {
+                    startBewertung = 4;
+                    endBewertung = 6;
+                }
+                case "gut" -> {
+                    startBewertung = 7;
+                    endBewertung = 9;
+                }
+                case "top" -> {
+                    startBewertung = 10;
+                    endBewertung = 10;
+                }
+                default -> throw new IllegalArgumentException("Invalid Bewertungsangabe: " + bewertungFrontend);
+            }
+        } else {
+            startBewertung = 1;
+            endBewertung = 10;
         }
 
         return allTastings.stream()
                 .filter(tasting -> (zubereitungsmethodeName == null || tasting.getZubereitungsmethodeName().equals(zubereitungsmethodeName))
-                        && (kaffeeSorteName == null || tasting.getKaffeeSorteName().equals(kaffeeSorteName))
-                        && (bewertungFrontend == null || (tasting.getBewertung() >= startBewertung && tasting.getBewertung() <= endBewertung)))
+                        && (kaffeesorteName == null || tasting.getKaffeesorteName().equals(kaffeesorteName))
+                        && (tasting.getBewertung() >= startBewertung && tasting.getBewertung() <= endBewertung))
                 .collect(Collectors.toList());
     }
-
 
     //getFilter für Filter-Dropdowns
 
@@ -135,49 +142,41 @@ public class ServiceBarrista {
         return new ArrayList<>(zubereitungsmethodenNamen);
     }
 
-    /*public List<String> getDistinctMethodenTypes() {
-        List<Zubereitungsmethode> methode = zubereitungsmethodeRepo.findMethodenTypes();
-        return methode.stream()
-                .map(Zubereitungsmethode::getMethodenType)
-                .distinct()
-                .collect(Collectors.toList());
-    }*/
-
     //Methoden für Formulare, Add, Update, Delete
 
     //Kaffeesorte
-    public Kaffeesorte addKaffeesorte(Kaffeesorte newKaffeesorte) throws KaffeesorteAlreadyExistsExeption {
+    public Kaffeesorte addKaffeesorte(Kaffeesorte newKaffeesorte) throws KaffeesorteAlreadyExistsException {
         Optional<Kaffeesorte> existingKaffeesorte = kaffeesorteRepo.findByKaffeesorteNameAndRoestereiName(
                 newKaffeesorte.getKaffeesorteName(),
                 newKaffeesorte.getRoestereiName()
         );
 
         if (existingKaffeesorte.isPresent()) {
-            throw new IllegalStateException("Die Kaffeesorte mit dem Namen: " + newKaffeesorte.getKaffeesorteName()
+            throw new KaffeesorteAlreadyExistsException("Die Kaffeesorte mit dem Namen: " + newKaffeesorte.getKaffeesorteName()
                     + "existiert bereits bei der angegebenen Rösterei.");
         }
         return kaffeesorteRepo.save(newKaffeesorte);
     }
 
-    public Kaffeesorte deleteKaffeesorteById(String Id) throws KaffeesorteDoesNotExistExeption {
-        Kaffeesorte removedKaffeesorte = kaffeesorteRepo.findById(Id).orElseThrow(
-                () -> new KaffeesorteDoesNotExistExeption("Es gibt keine Kaffeesorte mit der Id: " + Id + "Bitte versuche es noch einmal"));
-        kaffeesorteRepo.deleteById(Id);
+    public Kaffeesorte deleteKaffeesorteById(String id) throws KaffeesorteDoesNotExistException {
+        Kaffeesorte removedKaffeesorte = kaffeesorteRepo.findById(id).orElseThrow(
+                () -> new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit der id: " + id + "Bitte versuche es noch einmal"));
+        kaffeesorteRepo.deleteById(id);
         return removedKaffeesorte;
     }
 
-    public Kaffeesorte deleteKaffeesorteByKaffeesorteName(String KaffeesorteName) throws KaffeesorteDoesNotExistExeption {
-        Kaffeesorte deletedKaffeesorte = kaffeesorteRepo.findByKaffeesorteName(KaffeesorteName).orElseThrow(
-                () -> new KaffeesorteDoesNotExistExeption("Es gibt keine Kaffeesorte mit dem Namen: " + KaffeesorteName + "Bitte versuche es noch einmal"));
-        kaffeesorteRepo.deleteByKaffeesorteName(KaffeesorteName);
+    public Kaffeesorte deleteKaffeesorteByKaffeesorteName(String kaffeesorteName) throws KaffeesorteDoesNotExistException {
+        Kaffeesorte deletedKaffeesorte = kaffeesorteRepo.findByKaffeesorteName(kaffeesorteName).orElseThrow(
+                () -> new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit dem Namen: " + kaffeesorteName + "Bitte versuche es noch einmal"));
+        kaffeesorteRepo.deleteByKaffeesorteName(kaffeesorteName);
         return deletedKaffeesorte;
     }
 
-    public Kaffeesorte updateKaffeesorteById (String Id, Kaffeesorte updateKaffeesorte) throws KaffeesorteDoesNotExistExeption{
-        if (!kaffeesorteRepo.existsById(Id)) {
-            throw new KaffeesorteDoesNotExistExeption("Es gibt keine Kaffeesorte mit der ID: " + Id);
+    public Kaffeesorte updateKaffeesorteById (String id, Kaffeesorte updateKaffeesorte) throws KaffeesorteDoesNotExistException {
+        if (!kaffeesorteRepo.existsById(id)) {
+            throw new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit der ID: " + id);
         }
-        updateKaffeesorte.setId(Id);
+        updateKaffeesorte.setId(id);
         return kaffeesorteRepo.save(updateKaffeesorte);
     }
 
@@ -193,18 +192,18 @@ public class ServiceBarrista {
         return roestereiRepo.save(newRoesterei);
 
     }
-    public Roesterei deleteRoestereiById (String Id) throws RoestereiDoesNotExistException {
-        Roesterei deletedRoesterei = roestereiRepo.findById(Id).orElseThrow(
-                () -> new RoestereiDoesNotExistException("Es gibt keine Rösterei mit der Id: " + Id + "Bitte versuche es noch einmal"));
-        roestereiRepo.deleteById(Id);
+    public Roesterei deleteRoestereiById (String id) throws RoestereiDoesNotExistException {
+        Roesterei deletedRoesterei = roestereiRepo.findById(id).orElseThrow(
+                () -> new RoestereiDoesNotExistException("Es gibt keine Rösterei mit der id: " + id + "Bitte versuche es noch einmal"));
+        roestereiRepo.deleteById(id);
         return deletedRoesterei;
     }
 
-    public Roesterei updateRoestereiById (String Id, Roesterei updatedRoesterei) throws RoestereiDoesNotExistException {
-        if (!roestereiRepo.existsById(Id)) {
-            throw new RoestereiDoesNotExistException("Es gibt keine Roesterei mit der ID: " + Id);
+    public Roesterei updateRoestereiById (String id, Roesterei updatedRoesterei) throws RoestereiDoesNotExistException {
+        if (!roestereiRepo.existsById(id)) {
+            throw new RoestereiDoesNotExistException("Es gibt keine Roesterei mit der ID: " + id);
         }
-        updatedRoesterei.setId(Id);
+        updatedRoesterei.setId(id);
         return roestereiRepo.save(updatedRoesterei);
     }
 
@@ -220,18 +219,18 @@ public class ServiceBarrista {
         return tastingRepo.save(newTasting);
     }
 
-    public Tasting deleteTastingById(String Id) throws TastingDoesNotExistException {
-        Tasting deletedTasting = tastingRepo.findById(Id).orElseThrow(
-                () -> new TastingDoesNotExistException("Es gibt kein Tasting mit der Id: " + Id + ". Bitte versuche es noch einmal."));
-        tastingRepo.deleteById(Id);
+    public Tasting deleteTastingById(String id) throws TastingDoesNotExistException {
+        Tasting deletedTasting = tastingRepo.findById(id).orElseThrow(
+                () -> new TastingDoesNotExistException("Es gibt kein Tasting mit der id: " + id + ". Bitte versuche es noch einmal."));
+        tastingRepo.deleteById(id);
         return deletedTasting;
     }
 
-    public Tasting updateTastingById(String Id, Tasting updatedTasting) throws TastingDoesNotExistException {
-        if (!tastingRepo.existsById(Id)) {
-            throw new TastingDoesNotExistException("Es gibt kein Tasting mit der ID: " + Id);
+    public Tasting updateTastingById(String id, Tasting updatedTasting) throws TastingDoesNotExistException {
+        if (!tastingRepo.existsById(id)) {
+            throw new TastingDoesNotExistException("Es gibt kein Tasting mit der ID: " + id);
         }
-        updatedTasting.setId(Id);
+        updatedTasting.setId(id);
         return tastingRepo.save(updatedTasting);
     }
 
@@ -246,18 +245,18 @@ public class ServiceBarrista {
         return zubereitungsmethodeRepo.save(newZubereitungsmethode);
     }
 
-    public Zubereitungsmethode deleteZubereitungsmethodeById(String Id) throws ZubereitungsmethodeDoesNotExistException {
-        Zubereitungsmethode deletedZubereitungsmethode = zubereitungsmethodeRepo.findById(Id).orElseThrow(
-                () -> new ZubereitungsmethodeDoesNotExistException("Es gibt keine Zubereitungsmethode mit der Id: " + Id + ". Bitte versuche es noch einmal."));
-        zubereitungsmethodeRepo.deleteById(Id);
+    public Zubereitungsmethode deleteZubereitungsmethodeById(String id) throws ZubereitungsmethodeDoesNotExistException {
+        Zubereitungsmethode deletedZubereitungsmethode = zubereitungsmethodeRepo.findById(id).orElseThrow(
+                () -> new ZubereitungsmethodeDoesNotExistException("Es gibt keine Zubereitungsmethode mit der id: " + id + ". Bitte versuche es noch einmal."));
+        zubereitungsmethodeRepo.deleteById(id);
         return deletedZubereitungsmethode;
     }
 
-    public Zubereitungsmethode updateZubereitungsmethodeById(String Id, Zubereitungsmethode updatedZubereitungsmethode) throws ZubereitungsmethodeDoesNotExistException {
-        if (!zubereitungsmethodeRepo.existsById(Id)) {
-            throw new ZubereitungsmethodeDoesNotExistException("Es gibt keine Zubereitungsmethode mit der ID: " + Id);
+    public Zubereitungsmethode updateZubereitungsmethodeById(String id, Zubereitungsmethode updatedZubereitungsmethode) throws ZubereitungsmethodeDoesNotExistException {
+        if (!zubereitungsmethodeRepo.existsById(id)) {
+            throw new ZubereitungsmethodeDoesNotExistException("Es gibt keine Zubereitungsmethode mit der ID: " + id);
         }
-        updatedZubereitungsmethode.setId(Id);
+        updatedZubereitungsmethode.setId(id);
         return zubereitungsmethodeRepo.save(updatedZubereitungsmethode);
     }
 

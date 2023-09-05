@@ -6,20 +6,16 @@ import com.example.backend.data.Tasting;
 import com.example.backend.data.Zubereitungsmethode;
 import com.example.backend.exceptions.*;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/barrista")
+@RequestMapping("/barista")
 public class ControllerBarrista {
 
-    @Autowired
     private final ServiceBarrista serviceBarrista;
-
 
     //Listenseiten, getAll
     @GetMapping("/kaffeesorten")
@@ -69,10 +65,10 @@ public class ControllerBarrista {
     //Kaffeesorten
     @GetMapping("/kaffeesorten/filter")
     public List<Kaffeesorte> getFilteredKaffeesorten(
-            @RequestParam(value = "roestereiName", required = false) String roestereiName,
-            @RequestParam(value = "aromenprofil", required = false) String aromenprofil) {
+            @RequestParam(value = "RoestereiName", required = false) String RoestereiName,
+            @RequestParam(value = "Aromenprofil", required = false) String Aromenprofil) {
 
-        List<Kaffeesorte> filteredKaffeesorten = serviceBarrista.filterKaffeesorten(roestereiName, aromenprofil);
+        List<Kaffeesorte> filteredKaffeesorten = serviceBarrista.filterKaffeesorten(RoestereiName, Aromenprofil);
 
         return filteredKaffeesorten;
     }
@@ -81,10 +77,10 @@ public class ControllerBarrista {
     @GetMapping("/tastings/filter")
     public List<Tasting> filterTastings(
             @RequestParam(required = false) String zubereitungsmethodeName,
-            @RequestParam(required = false) String kaffeeSorteName,
+            @RequestParam(required = false) String kaffeesorteName,
             @RequestParam(required = false) String bewertungFrontend) {
 
-        List<Tasting> filteredTastings = serviceBarrista.filterTastings(zubereitungsmethodeName, kaffeeSorteName, bewertungFrontend);
+        List<Tasting> filteredTastings = serviceBarrista.filterTastings(zubereitungsmethodeName, kaffeesorteName, bewertungFrontend);
 
         return filteredTastings;
     }
@@ -92,8 +88,8 @@ public class ControllerBarrista {
     //Zubereitungsmethode
     @GetMapping("/zubereitungsmethoden/filter")
     public List<Zubereitungsmethode> filterZubereitungsmethode(
-            @RequestParam String MethodenType){
-        List <Zubereitungsmethode> filteredZubereitungsmethode = serviceBarrista.filterbyMethodenType(MethodenType);
+            @RequestParam String methodenType){
+        List <Zubereitungsmethode> filteredZubereitungsmethode = serviceBarrista.filterbyMethodenType(methodenType);
 
         return filteredZubereitungsmethode;
     }
@@ -102,21 +98,20 @@ public class ControllerBarrista {
     //Formularseiten
     //Kaffeesorte
 
-    @PostMapping("/kaffeesorte")
-    public Kaffeesorte addKaffeesorte(@RequestBody Kaffeesorte newKaffeesorte) throws KaffeesorteAlreadyExistsExeption {
+    @PostMapping("/newkaffeesorte")
+    public Kaffeesorte addKaffeesorte(@RequestBody Kaffeesorte newKaffeesorte) throws KaffeesorteAlreadyExistsException {
         return serviceBarrista.addKaffeesorte(newKaffeesorte);
     }
 
     @DeleteMapping("/kaffeesorte/{id}")
-    public Kaffeesorte deleteKaffeesorteById(@PathVariable String id) throws KaffeesorteDoesNotExistExeption {
+    public Kaffeesorte deleteKaffeesorteById(@PathVariable String id) throws KaffeesorteDoesNotExistException {
         return serviceBarrista.deleteKaffeesorteById(id);
     }
 
     @PutMapping("/kaffeesorte/{id}")
-    public Kaffeesorte updateKaffeesorteById(@PathVariable String id, @RequestBody Kaffeesorte updateKaffeesorte) throws KaffeesorteDoesNotExistExeption {
-        return serviceBarrista.updateKaffeesorteById(id, updateKaffeesorte);
+    public Kaffeesorte updateKaffeesorteById(@PathVariable String id, @RequestBody Kaffeesorte updatedKaffeesorte) throws KaffeesorteDoesNotExistException {
+        return serviceBarrista.updateKaffeesorteById(id, updatedKaffeesorte);
     }
-
 
     //Röstereien
 
@@ -169,7 +164,5 @@ public class ControllerBarrista {
     public Zubereitungsmethode updateZubereitungsmethodeById(@PathVariable String id, @RequestBody Zubereitungsmethode updatedZubereitungsmethode) throws ZubereitungsmethodeDoesNotExistException {
         return serviceBarrista.updateZubereitungsmethodeById(id, updatedZubereitungsmethode);
     }
-
-
 
 }

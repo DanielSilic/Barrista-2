@@ -10,10 +10,10 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class Zubereitungsmethode {
     @Id
-    private String Id;
-    private String ZubereitungsmethodeName;
-    private String Barrista;
-    private String MethodenType;
-    private String MethodenBeschreibung;
-    private String FotoUrlZubereitungsmethode;
+    private String id;
+    private String zubereitungsmethodeName;
+    private String barista;
+    private String methodenType;
+    private String methodenBeschreibung;
+    private String fotoUrlZubereitungsmethode;
 }
