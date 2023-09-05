@@ -9,6 +9,7 @@ import com.example.backend.repos.KaffeesorteRepo;
 import com.example.backend.repos.RoestereiRepo;
 import com.example.backend.repos.TastingRepo;
 import com.example.backend.repos.ZubereitungsmethodeRepo;
+import com.mongodb.lang.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,53 +44,58 @@ public class ServiceBarrista {
     }
 
 
-    //getByX für gefilterte Listen
+    //filterbyX für gefilterte Listen
 
-    public List<Kaffeesorte> filterByRoestereiName(String roestereiName) {
-        return kaffeesorteRepo.findByRoestereiName(roestereiName);
+    //Kaffeesorten
+    public List<Kaffeesorte> filterKaffeesorten(@Nullable String RoestereiName, @Nullable String Aromenprofil) {
+        List<Kaffeesorte> allKaffeesorten = kaffeesorteRepo.findAll();
+
+        return allKaffeesorten.stream()
+                .filter(kaffeesorte -> (RoestereiName == null || kaffeesorte.getRoestereiName().equals(RoestereiName))
+                        && (Aromenprofil == null || kaffeesorte.getAromenprofil().equals(Aromenprofil)))
+                .collect(Collectors.toList());
     }
-    public List<Kaffeesorte> filterByAromenprofil(String aromenprofil) {
-        return kaffeesorteRepo.findByAromenprofil(aromenprofil);
-    }
-    public List<Kaffeesorte> filterbyVariety(String variety) {
-        return kaffeesorteRepo.findByVariety(variety);
-    }
+
+    //Zubereitungsmethoden
     public List<Zubereitungsmethode> filterbyMethodenType (String MethodenType){
         return zubereitungsmethodeRepo.findByMethodenType(MethodenType);
     }
-    public List<Tasting> filterbyKaffeeSorteName (String KaffeeSorteName){
-        return tastingRepo.findByKaffeeSorteName (KaffeeSorteName);
-    }
-    public List<Tasting> filterbyBewertung (int Bewertung){
-        return tastingRepo.findByBewertung(Bewertung);
-    }
 
-    public List<Tasting> getTastingsByBewertung(String bewertungFrontend) {
-        int start, end;
+    //Tastings
+
+    public List<Tasting> filterTastings(@Nullable String zubereitungsmethodeName, @Nullable String kaffeeSorteName, @Nullable String bewertungFrontend) {
+        List<Tasting> allTastings = tastingRepo.findAll();
+
+        int startBewertung, endBewertung;
 
         switch (bewertungFrontend.toLowerCase()) {
             case "schlecht":
-                start = 1;
-                end = 3;
+                startBewertung = 1;
+                endBewertung = 3;
                 break;
             case "mittel":
-                start = 4;
-                end = 6;
+                startBewertung = 4;
+                endBewertung = 6;
                 break;
             case "gut":
-                start = 7;
-                end = 9;
+                startBewertung = 7;
+                endBewertung = 9;
                 break;
             case "top":
-                start = 10;
-                end = 10;
+                startBewertung = 10;
+                endBewertung = 10;
                 break;
             default:
-                throw new IllegalArgumentException("Invalide Bewertungsangabe: " + bewertungFrontend);
+                throw new IllegalArgumentException("Invalid Bewertungsangabe: " + bewertungFrontend);
         }
 
-        return tastingRepo.findByBewertungBetween(start, end);
+        return allTastings.stream()
+                .filter(tasting -> (zubereitungsmethodeName == null || tasting.getZubereitungsmethodeName().equals(zubereitungsmethodeName))
+                        && (kaffeeSorteName == null || tasting.getKaffeeSorteName().equals(kaffeeSorteName))
+                        && (bewertungFrontend == null || (tasting.getBewertung() >= startBewertung && tasting.getBewertung() <= endBewertung)))
+                .collect(Collectors.toList());
     }
+
 
     //getFilter für Filter-Dropdowns
 
@@ -129,13 +135,13 @@ public class ServiceBarrista {
         return new ArrayList<>(zubereitungsmethodenNamen);
     }
 
-    public List<String> getDistinctMethodenTypes() {
+    /*public List<String> getDistinctMethodenTypes() {
         List<Zubereitungsmethode> methode = zubereitungsmethodeRepo.findMethodenTypes();
         return methode.stream()
                 .map(Zubereitungsmethode::getMethodenType)
                 .distinct()
                 .collect(Collectors.toList());
-    }
+    }*/
 
     //Methoden für Formulare, Add, Update, Delete
 
@@ -174,7 +180,6 @@ public class ServiceBarrista {
         updateKaffeesorte.setId(Id);
         return kaffeesorteRepo.save(updateKaffeesorte);
     }
-
 
     //Roesterei
 
