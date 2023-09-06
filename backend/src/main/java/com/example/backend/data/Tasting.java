@@ -10,15 +10,15 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class Tasting {
     @Id
-    private String Id;
-    private String TastingName;
-    private String KaffeeSorteName;
-    private String ZubereitungsmethodeName;
-    private String Mahlgrad;
-    private String WasserSorte;
-    private String Wassertemperatur;
-    private String Ergebnis;
-    private int Bewertung;
-    private String Anmerkungen;
+    private String id;
+    private String tastingName;
+    private String kaffeesorteName;
+    private String zubereitungsmethodeName;
+    private String mahlgrad;
+    private String wassersorte;
+    private String wassertemperatur;
+    private String ergebnis;
+    private int bewertung;
+    private String anmerkungen;
 
 }

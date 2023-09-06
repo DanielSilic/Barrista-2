@@ -11,19 +11,19 @@ import org.springframework.data.annotation.Id;
 public class Kaffeesorte {
 
     @Id
-    private String Id;
-    private String KaffeesorteName;
-    private String RoestereiName;
-    private String Variety;
-    private String Aufbereitung;
-    private String Herkunftsland;
-    private String Aromen;
-    private String Aromenprofil;
-    private String Koerper;
-    private String Suesse;
-    private String GeschmacksnotenHeiss;
-    private String GeschmacksnotenMedium;
-    private String GeschmacksnotenKalt;
-    private String FreezingDate;
-    private String FotoUrlKaffeesorte;
+    private String id;
+    private String kaffeesorteName;
+    private String roestereiName;
+    private String variety;
+    private String aufbereitung;
+    private String herkunftsland;
+    private String aromen;
+    private String aromenProfil;
+    private String koerper;
+    private String suesse;
+    private String geschmacksnotenHeiss;
+    private String geschmacksnotenMedium;
+    private String geschmacksnotenKalt;
+    private String freezingDate;
+    private String fotoUrlKaffeesorte;
 }

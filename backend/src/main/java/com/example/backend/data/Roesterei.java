@@ -5,17 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Roesterei {
 
     @Id
-    private String Id;
-    private String RoestereiName;
-    private String RoestereiBeschreibung;
-    private String FotoUrlRoesterei;
+    private String id;
+    private String roestereiName;
+    private String roestereiBeschreibung;
+    private String fotoUrlRoesterei;
 
 }

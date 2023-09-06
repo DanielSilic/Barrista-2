@@ -1,8 +1,8 @@
 package com.example.backend;
 
 import com.example.backend.data.Kaffeesorte;
-import com.example.backend.exceptions.KaffeesorteAlreadyExistsExeption;
-import com.example.backend.exceptions.KaffeesorteDoesNotExistExeption;
+import com.example.backend.exceptions.KaffeesorteAlreadyExistsException;
+import com.example.backend.exceptions.KaffeesorteDoesNotExistException;
 import com.example.backend.repos.KaffeesorteRepo;
 import com.example.backend.repos.RoestereiRepo;
 import com.example.backend.repos.TastingRepo;
@@ -10,8 +10,6 @@ import com.example.backend.repos.ZubereitungsmethodeRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -87,7 +85,7 @@ public class ServiceBarristaTest {
         Mockito.when(kaffeesorteRepo.findAll()).thenReturn(mockKaffeesorten);
 
         List<Kaffeesorte> expectedFilteredKaffeesorten = mockKaffeesorten.stream()
-                .filter(k -> k.getRoestereiName().equals("RoestereiA") && k.getAromenprofil().equals("AromenprofilB"))
+                .filter(k -> k.getRoestereiName().equals("RoestereiA") && k.getAromenProfil().equals("AromenprofilB"))
                 .collect(Collectors.toList());
 
         Assertions.assertEquals(
@@ -156,7 +154,7 @@ public class ServiceBarristaTest {
     }
 
     @Test
-    public void addKaffeesorte_whenKaffeesorteDoesNotExist_thenSaveAndReturnKaffeesorte() throws KaffeesorteAlreadyExistsExeption {
+    public void addKaffeesorte_whenKaffeesorteDoesNotExist_thenSaveAndReturnKaffeesorte() throws KaffeesorteAlreadyExistsException {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);
 
@@ -175,7 +173,7 @@ public class ServiceBarristaTest {
     }
 
     @Test
-    public void deleteKaffeesorteByKaffeesorteName_whenKaffeesorteExists_thenDeleteAndReturnDeletedKaffeesorte() throws KaffeesorteDoesNotExistExeption {
+    public void deleteKaffeesorteByKaffeesorteName_whenKaffeesorteExists_thenDeleteAndReturnDeletedKaffeesorte() throws KaffeesorteDoesNotExistException {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);
 
@@ -205,13 +203,13 @@ public class ServiceBarristaTest {
                 .thenReturn(Optional.empty());
 
         Assertions.assertThrows(
-                KaffeesorteDoesNotExistExeption.class,
+                KaffeesorteDoesNotExistException.class,
                 () -> serviceBarrista.deleteKaffeesorteByKaffeesorteName("NonExistentKaffeesorte")
         );
     }
 
     @Test
-    public void updateKaffeesorteById_whenKaffeesorteExists_thenUpdateAndReturnKaffeesorte() throws KaffeesorteDoesNotExistExeption {
+    public void updateKaffeesorteById_whenKaffeesorteExists_thenUpdateAndReturnKaffeesorte() throws KaffeesorteDoesNotExistException {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);
 
@@ -244,13 +242,13 @@ public class ServiceBarristaTest {
         Mockito.when(kaffeesorteRepo.existsById(nonExistentKaffeesorteId)).thenReturn(false);
 
         Assertions.assertThrows(
-                KaffeesorteDoesNotExistExeption.class,
+                KaffeesorteDoesNotExistException.class,
                 () -> serviceBarrista.updateKaffeesorteById(nonExistentKaffeesorteId, updatedKaffeesorteInfo)
         );
     }
 
     @Test
-    public void deleteKaffeesorteById_whenKaffeesorteExists_thenRemoveAndReturnRemovedKaffeesorte() throws KaffeesorteDoesNotExistExeption {
+    public void deleteKaffeesorteById_whenKaffeesorteExists_thenRemoveAndReturnRemovedKaffeesorte() throws KaffeesorteDoesNotExistException {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);  // Passing null for other repos since they aren't used in this method
 
@@ -278,7 +276,7 @@ public class ServiceBarristaTest {
 
         Mockito.when(kaffeesorteRepo.findById(kaffeesorteIdToRemove)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(KaffeesorteDoesNotExistExeption.class, () -> {
+        Assertions.assertThrows(KaffeesorteDoesNotExistException.class, () -> {
             serviceBarrista.deleteKaffeesorteById(kaffeesorteIdToRemove);
         });
 

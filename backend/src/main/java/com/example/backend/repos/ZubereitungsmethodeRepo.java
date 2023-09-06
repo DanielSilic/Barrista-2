@@ -2,7 +2,6 @@ package com.example.backend.repos;
 
 import com.example.backend.data.Zubereitungsmethode;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +13,4 @@ public interface ZubereitungsmethodeRepo extends MongoRepository<Zubereitungsmet
 
     Optional<Zubereitungsmethode> findByZubereitungsmethodeName(String ZubereitungsmethodeName);
 
-    @Query(value = "{}", fields = "{ 'MethodenType' : 1}")
-    List<Zubereitungsmethode> findMethodenTypes();
 }
