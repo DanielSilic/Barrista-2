@@ -129,7 +129,7 @@ public class BarristaControllerTest {
                 "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
         kaffeesorteRepo.save(kaffeesorte);
 
-        mvc.perform(MockMvcRequestBuilders.delete("/barista/newkaffeesorte/123456")
+        mvc.perform(MockMvcRequestBuilders.delete("/barista/kaffeesorte/123456")
                         .with(csrf()))
 
                 .andExpect(MockMvcResultMatchers.status().isOk())
