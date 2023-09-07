@@ -11,6 +11,9 @@ import com.example.backend.repos.TastingRepo;
 import com.example.backend.repos.ZubereitungsmethodeRepo;
 import com.mongodb.lang.Nullable;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,14 +50,22 @@ public class ServiceBarrista {
     //filterbyX für gefilterte Listen
 
     //Kaffeesorten
-    public List<Kaffeesorte> filterKaffeesorten(@Nullable String roestereiName, @Nullable String aromenProfil) {
-        List<Kaffeesorte> allKaffeesorten = kaffeesorteRepo.findAll();
+    public Page<Kaffeesorte> filterKaffeesorten(@Nullable String roestereiName, @Nullable String aromenProfil, Pageable pageable) {
+        Page<Kaffeesorte> allKaffeesorten = kaffeesorteRepo.findAll(pageable);
 
-        return allKaffeesorten.stream()
-                .filter(kaffeesorte -> (roestereiName == null || kaffeesorte.getRoestereiName().equals(roestereiName))
-                        && (aromenProfil == null || kaffeesorte.getAromenProfil().equals(aromenProfil)))
+        List<Kaffeesorte> filteredList = allKaffeesorten.stream()
+                .filter(kaffeesorte ->
+                        (roestereiName == null || kaffeesorte.getRoestereiName().equals(roestereiName))
+                                &&
+                                (aromenProfil == null || Arrays.asList(kaffeesorte.getAromenProfil().split(", ")).contains(aromenProfil))
+                )
                 .collect(Collectors.toList());
+
+        // Convert the filtered list back to a Page
+        return new PageImpl<>(filteredList, pageable, filteredList.size());
     }
+
+
 
     //Zubereitungsmethoden
     public List<Zubereitungsmethode> filterbyMethodenType (String methodenType){

@@ -4,17 +4,15 @@ import com.example.backend.data.Kaffeesorte;
 import com.example.backend.exceptions.KaffeesorteAlreadyExistsException;
 import com.example.backend.exceptions.KaffeesorteDoesNotExistException;
 import com.example.backend.repos.KaffeesorteRepo;
-import com.example.backend.repos.RoestereiRepo;
-import com.example.backend.repos.TastingRepo;
-import com.example.backend.repos.ZubereitungsmethodeRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ServiceBarristaTest {
@@ -27,10 +25,7 @@ public class ServiceBarristaTest {
     @Test
     public void getAllKaffeesorten_whenGetAll_thenReturnCorrectList() {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
-        RoestereiRepo roestereiRepo = Mockito.mock(RoestereiRepo.class);
-        TastingRepo tastingRepo = Mockito.mock(TastingRepo.class);
-        ZubereitungsmethodeRepo zubereitungsmethodeRepo = Mockito.mock(ZubereitungsmethodeRepo.class);
-        ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, roestereiRepo, tastingRepo, zubereitungsmethodeRepo);
+        ServiceBarrista serviceBarrista = new ServiceBarrista (kaffeesorteRepo, null, null, null);
 
         Mockito.when(kaffeesorteRepo.findAll()).thenReturn(List.of(
                 new Kaffeesorte("1", "KaffeesorteA", "RoestereiA", "VarietyA",
@@ -65,36 +60,39 @@ public class ServiceBarristaTest {
     @Test
     public void filterKaffeesorten_whenFilter_returnCorrectList() {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
-        RoestereiRepo roestereiRepo = Mockito.mock(RoestereiRepo.class);
-        TastingRepo tastingRepo = Mockito.mock(TastingRepo.class);
-        ZubereitungsmethodeRepo zubereitungsmethodeRepo = Mockito.mock(ZubereitungsmethodeRepo.class);
-        ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, roestereiRepo, tastingRepo, zubereitungsmethodeRepo);
+        ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);
 
         List<Kaffeesorte> mockKaffeesorten = List.of(
                 new Kaffeesorte("1", "KaffeesorteA", "RoestereiA", "VarietyA",
-                        "AufbereitungA", "LandA", "AromenA", "AromenprofilA",
+                        "AufbereitungA", "LandA", "AromenA", "AromenprofilA, AromenprofilB",
                         "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
                         "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA"),
-
                 new Kaffeesorte("2", "KaffeesorteB", "RoestereiA", "VarietyB",
-                        "AufbereitungB", "LandB", "AromenB", "AromenprofilB",
+                        "AufbereitungB", "LandB", "AromenB", "AromenprofilB, AromenprofilC",
                         "KoerperB", "SuesseB", "GeschmacksnotenHeissB", "GeschmacksnotenMediumB",
                         "GeschmacksnotenKaltB", "FreezingDateB", "FotoUrlKaffeesorteB")
         );
 
-        Mockito.when(kaffeesorteRepo.findAll()).thenReturn(mockKaffeesorten);
+        Pageable mockPageable = PageRequest.of(0, 10);
+        Page<Kaffeesorte> mockPageKaffeesorten = new PageImpl<>(mockKaffeesorten);
+
+        Mockito.when(kaffeesorteRepo.findAll(mockPageable)).thenReturn(mockPageKaffeesorten);
 
         List<Kaffeesorte> expectedFilteredKaffeesorten = mockKaffeesorten.stream()
-                .filter(k -> k.getRoestereiName().equals("RoestereiA") && k.getAromenProfil().equals("AromenprofilB"))
+                .filter(k -> k.getRoestereiName().equals("RoestereiA") && Arrays.asList(k.getAromenProfil().split(", ")).contains("AromenprofilB"))
                 .collect(Collectors.toList());
 
+        Page<Kaffeesorte> expectedPage = new PageImpl<>(expectedFilteredKaffeesorten, mockPageable, expectedFilteredKaffeesorten.size());
+
         Assertions.assertEquals(
-                expectedFilteredKaffeesorten,
-                serviceBarrista.filterKaffeesorten("RoestereiA", "AromenprofilB")
+                expectedPage,
+                serviceBarrista.filterKaffeesorten("RoestereiA", "AromenprofilB", mockPageable)
         );
 
-        Mockito.verify(kaffeesorteRepo).findAll();
+        Mockito.verify(kaffeesorteRepo).findAll(mockPageable);
     }
+
+
 
     @Test
     public void getAllKaffeesorteName_whenCalled_thenReturnUniqueKaffeesorteNames() {
@@ -114,7 +112,6 @@ public class ServiceBarristaTest {
                         "AufbereitungB", "LandB", "AromenB", "AromenprofilB",
                         "KoerperB", "SuesseB", "GeschmacksnotenHeissB", "GeschmacksnotenMediumB",
                         "GeschmacksnotenKaltB", "FreezingDateB", "FotoUrlKaffeesorteB")
-
         );
 
         Mockito.when(kaffeesorteRepo.findAll()).thenReturn(mockKaffeesorten);
@@ -134,7 +131,7 @@ public class ServiceBarristaTest {
     }
 
     @Test
-    public void addKaffeesorte_whenKaffeesorteAlreadyExists_thenThrowIllegalStateException() {
+    public void addKaffeesorte_whenKaffeesorteAlreadyExists_thenThrowKaffeesorteAlreadyExistsException() {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista(kaffeesorteRepo, null, null, null);
 
@@ -146,9 +143,8 @@ public class ServiceBarristaTest {
         Mockito.when(kaffeesorteRepo.findByKaffeesorteNameAndRoestereiName(existingKaffeesorte.getKaffeesorteName(), existingKaffeesorte.getRoestereiName()))
                 .thenReturn(Optional.of(existingKaffeesorte));
 
-        // Assertion: Exception wird geworfen
         Assertions.assertThrows(
-                IllegalStateException.class,
+                KaffeesorteAlreadyExistsException.class,
                 () -> serviceBarrista.addKaffeesorte(existingKaffeesorte)
         );
     }
@@ -276,9 +272,9 @@ public class ServiceBarristaTest {
 
         Mockito.when(kaffeesorteRepo.findById(kaffeesorteIdToRemove)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(KaffeesorteDoesNotExistException.class, () -> {
-            serviceBarrista.deleteKaffeesorteById(kaffeesorteIdToRemove);
-        });
+        Assertions.assertThrows(KaffeesorteDoesNotExistException.class,
+                () -> serviceBarrista.deleteKaffeesorteById(kaffeesorteIdToRemove));
+
 
         Mockito.verify(kaffeesorteRepo).findById(kaffeesorteIdToRemove);
         Mockito.verify(kaffeesorteRepo, Mockito.never()).deleteById(Mockito.anyString());

@@ -11,5 +11,5 @@ public interface KaffeesorteRepo extends MongoRepository<Kaffeesorte,String> {
 
     Optional<Kaffeesorte> findByKaffeesorteName(String kaffeesorteName);
     Optional<Kaffeesorte> findByKaffeesorteNameAndRoestereiName(String kaffeesorteName, String roestereiName);
-    void deleteByKaffeesorteName(String KaffeesorteName);
+    void deleteByKaffeesorteName(String kaffeesorteName);
 }

@@ -227,12 +227,12 @@ public class BarristaControllerTest {
     @WithMockUser(username = "Dan", password = "123")
     void getFilteredKaffeesorten_shouldReturnFilteredKaffeesorten_basedOnParams() throws Exception {
         Kaffeesorte kaffeesorte1 = new Kaffeesorte("123", "KaffeesorteA", "RoestereiA", "VarietyA",
-                "AufbereitungA", "LandA", "AromenA", "AromenprofilA",
+                "AufbereitungA", "LandA", "AromenA", "AromenprofilA, blumig",
                 "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
                 "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
 
         Kaffeesorte kaffeesorte2 = new Kaffeesorte("456", "KaffeesorteB", "RoestereiB", "VarietyB",
-                "AufbereitungB", "LandB", "AromenB", "AromenprofilB",
+                "AufbereitungB", "LandB", "AromenB", "AromenprofilB, fruchtig",
                 "KoerperB", "SuesseB", "GeschmacksnotenHeissB", "GeschmacksnotenMediumB",
                 "GeschmacksnotenKaltB", "FreezingDateB", "FotoUrlKaffeesorteB");
 
@@ -241,11 +241,15 @@ public class BarristaControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorten/filter")
                         .param("RoestereiName", "RoestereiA")
+                        .param("aromenProfil", "blumig")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].roestereiName", Matchers.is("RoestereiA")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].roestereiName", Matchers.is("RoestereiA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].aromenProfil", Matchers.containsString("blumig")));
     }
+
+
 
     //Tasting
 
