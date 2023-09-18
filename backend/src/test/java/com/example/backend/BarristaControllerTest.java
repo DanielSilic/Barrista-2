@@ -5,7 +5,10 @@ import com.example.backend.data.Tasting;
 import com.example.backend.repos.KaffeesorteRepo;
 import com.example.backend.repos.TastingRepo;
 import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +21,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+
 @SpringBootTest
 @AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class BarristaControllerTest {
 
     @Autowired
@@ -31,93 +36,80 @@ public class BarristaControllerTest {
     @Autowired
     private TastingRepo tastingRepo;
 
-
-    /*Kaffeesorte: getAll_EmptyList, getAll_OneObject, addDuplicate409,
-    deleteKaffeesorte, deleteKaffeesorte_404, UpdateKaffeesorte, getFilteredKaffeesorten*/
-    @DirtiesContext
     @Test
+    @DirtiesContext
     @WithMockUser(username = "Dan", password = "123")
     void getAllKaffeesorten_shouldReturnEmptyList_whenDatabaseIsEmpty() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorten")
+
+        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorte")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json("[]"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", hasSize(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalPages").value(0));
     }
 
-    @DirtiesContext
     @Test
+    @DirtiesContext
     @WithMockUser(username = "Dan", password = "123")
     void getAllKaffeesorten_shouldReturnListWithOneObject_whenOneObjectWasSavedInRepository() throws Exception {
-        Kaffeesorte kaffeesorte = new Kaffeesorte("123456","KaffeesorteA", "RoestereiA", "VarietyA",
+        Kaffeesorte kaffeesorte = new Kaffeesorte("123456", "KaffeesorteA", "RoestereiA", "VarietyA",
                 "AufbereitungA", "LandA", "AromenA", "AromenprofilA",
                 "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
                 "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
-
         kaffeesorteRepo.save(kaffeesorte);
 
-        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorten"))
+        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorte")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
-                        """
-                        [
-                           {
-                             "id": "123456",
-                             "kaffeesorteName": "KaffeesorteA",
-                             "roestereiName": "RoestereiA",
-                             "aufbereitung": "AufbereitungA",
-                             "herkunftsland": "LandA",
-                             "aromen": "AromenA",
-                             "aromenProfil": "AromenprofilA",
-                             "koerper": "KoerperA",
-                             "suesse": "SuesseA",
-                             "geschmacksnotenHeiss": "GeschmacksnotenHeissA",
-                             "geschmacksnotenMedium": "GeschmacksnotenMediumA",
-                             "geschmacksnotenKalt": "GeschmacksnotenKaltA",
-                             "freezingDate": "FreezingDateA",
-                             "fotoUrlKaffeesorte": "FotoUrlKaffeesorteA"
-                           }
-                         ]
-                        """
-                ));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].id").value("123456"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].kaffeesorteName").value("KaffeesorteA"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].roestereiName").value("RoestereiA"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1));
     }
 
+
     @Test
-    @WithMockUser(username = "Dan", password = "123")
     @DirtiesContext
-    void addDuplicateKaffeesorte_ShouldReturn409_CheckWithNAmeAndRoesterei() throws Exception {
-        Kaffeesorte originalKaffeesorte = new Kaffeesorte("123456","KaffeesorteA", "RoestereiA", "VarietyA",
+    @WithMockUser(username = "Dan", password = "123")
+    public void testAddKaffeesorte_Duplicate_ThrowsException() throws Exception {
+        Kaffeesorte existingKaffeesorte = new Kaffeesorte("123456","KaffeesorteA", "RoestereiA", "VarietyA",
                 "AufbereitungA", "LandA", "AromenA", "AromenprofilA",
                 "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
                 "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
 
-        kaffeesorteRepo.save(originalKaffeesorte);
-
-        String duplicateKaffeesorteJson = """
-        {
-            "id": "123457",
-            "kaffeesorteName": "KaffeesorteA",
-            "roestereiName": "RoestereiA",
-            "aufbereitung": "AufbereitungA",
-            "herkunftsland": "LandA",
-            "aromen": "AromenA",
-            "aromenProfil": "AromenprofilA",
-            "koerper": "KoerperA",
-            "suesse": "SuesseA",
-            "geschmacksnotenHeiss": "GeschmacksnotenHeissA",
-            "geschmacksnotenMedium": "GeschmacksnotenMediumA",
-            "geschmacksnotenKalt": "GeschmacksnotenKaltA",
-            "freezingDate": "FreezingDateA",
-            "fotoUrlKaffeesorte": "FotoUrlKaffeesorteA"
-        }
-    """;
+        kaffeesorteRepo.save(existingKaffeesorte);
 
         mvc.perform(MockMvcRequestBuilders.post("/barista/newkaffeesorte")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(duplicateKaffeesorteJson)
+                        .content(
+                                """
+                                 {
+                                     "id": "123456",
+                                     "kaffeesorteName": "KaffeesorteA",
+                                     "roestereiName": "RoestereiA",
+                                     "variety": "VarietyA",
+                                     "aufbereitung": "AufbereitungA",
+                                     "herkunftsland": "LandA",
+                                     "aromen": "AromenA",
+                                     "aromenProfil": "UpdatedAromenProfil",
+                                     "koerper": "KoerperA",
+                                     "suesse": "SuesseA",
+                                     "geschmacksnotenHeiss": "GeschmacksnotenHeissA",
+                                     "geschmacksnotenMedium": "GeschmacksnotenMediumA",
+                                     "geschmacksnotenKalt": "GeschmacksnotenKaltA",
+                                     "freezingDate": "FreezingDateA",
+                                     "fotoUrlKaffeesorte": "FotoUrlKaffeesorteA"
+                                 }
+                                """
+                        )
                         .with(csrf()))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+
+
 
     @DirtiesContext
     @Test
@@ -157,7 +149,7 @@ public class BarristaControllerTest {
 
     @Test
     @WithMockUser(username = "Dan", password = "123")
-    void deleteEmployee_shouldReturn404_whenNoEmplyoeeWasFoundToDelete() throws Exception {
+    void deleteKaffeesorte_shouldReturn404_whenNoKaffeesorteWasFoundToDelete() throws Exception {
         mvc.perform(MockMvcRequestBuilders.delete("/barista/kaffeesorte/1000")
                         .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -222,8 +214,8 @@ public class BarristaControllerTest {
                 ));
     }
 
-    @DirtiesContext
     @Test
+    @DirtiesContext
     @WithMockUser(username = "Dan", password = "123")
     void getFilteredKaffeesorten_shouldReturnFilteredKaffeesorten_basedOnParams() throws Exception {
         Kaffeesorte kaffeesorte1 = new Kaffeesorte("123", "KaffeesorteA", "RoestereiA", "VarietyA",
@@ -240,15 +232,15 @@ public class BarristaControllerTest {
         kaffeesorteRepo.save(kaffeesorte2);
 
         mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorten/filter")
-                        .param("RoestereiName", "RoestereiA")
+                        .param("roestereiName", "RoestereiA")
                         .param("aromenProfil", "blumig")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].roestereiName", Matchers.is("RoestereiA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content[0].aromenProfil", Matchers.containsString("blumig")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.kaffeesorten", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.kaffeesorten[0].roestereiName", Matchers.is("RoestereiA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.kaffeesorten[0].aromenProfil", Matchers.containsString("blumig")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalItems", Matchers.is(1)));
     }
-
 
 
     //Tasting
@@ -275,6 +267,38 @@ public class BarristaControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].zubereitungsmethodeName", Matchers.is("ZubereitungA")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].bewertung", Matchers.is(5)));
     }
+
+    @Test
+    void getKaffeesorteById_shouldReturnKaffeesorte() throws Exception {
+        Kaffeesorte kaffeesorte = new Kaffeesorte("123", "KaffeesorteA", "RoestereiA", "VarietyA",
+                "AufbereitungA", "LandA", "AromenA", "AromenprofilA, blumig",
+                "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
+                "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
+
+        kaffeesorteRepo.save(kaffeesorte);
+
+        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorte/123")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.is("123")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.kaffeesorteName", Matchers.is("KaffeesorteA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roestereiName", Matchers.is("RoestereiA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.variety", Matchers.is("VarietyA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.aufbereitung", Matchers.is("AufbereitungA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.herkunftsland", Matchers.is("LandA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.aromen", Matchers.is("AromenA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.aromenProfil", Matchers.is("AromenprofilA, blumig")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.koerper", Matchers.is("KoerperA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.suesse", Matchers.is("SuesseA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.geschmacksnotenHeiss", Matchers.is("GeschmacksnotenHeissA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.geschmacksnotenMedium", Matchers.is("GeschmacksnotenMediumA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.geschmacksnotenKalt", Matchers.is("GeschmacksnotenKaltA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.freezingDate", Matchers.is("FreezingDateA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fotoUrlKaffeesorte", Matchers.is("FotoUrlKaffeesorteA")));
+    }
+
+
+
 
 }
 

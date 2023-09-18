@@ -11,4 +11,7 @@ public interface TastingRepo extends MongoRepository<Tasting,String> {
 
     Optional<Tasting> findByTastingName(String tastingName);
 
+    Optional<Tasting> findTastingById(String id);
+
+
 }

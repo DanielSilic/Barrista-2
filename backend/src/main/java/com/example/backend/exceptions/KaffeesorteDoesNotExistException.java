@@ -6,8 +6,4 @@ public class KaffeesorteDoesNotExistException extends Exception {
         super(message);
     }
 
-    public KaffeesorteDoesNotExistException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }

@@ -6,7 +6,4 @@ public class KaffeesorteAlreadyExistsException extends Exception{
         super(message);
     }
 
-    public KaffeesorteAlreadyExistsException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

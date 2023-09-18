@@ -5,7 +5,4 @@ public class RoestereiDoesAlreadyExistException extends Exception {
         super(message);
     }
 
-    public RoestereiDoesAlreadyExistException (String message, Throwable cause) {
-        super(message, cause);
-    }
 }

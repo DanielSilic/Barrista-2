@@ -30,16 +30,16 @@ public class ServiceBarrista {
 
     //GetALL für Übersichtslisten
 
-    public List<Kaffeesorte> getAllKaffeesorten() {
-        return kaffeesorteRepo.findAll();
+    public Page<Kaffeesorte> getAllKaffeesorten(Pageable pageable) {
+        return kaffeesorteRepo.findAll(pageable);
     }
 
     public List<Roesterei> getAllRoestereien() {
         return roestereiRepo.findAll();
     }
 
-    public List<Tasting> getAllTastings() {
-        return tastingRepo.findAll();
+    public Page<Tasting> getAllTastings(Pageable pageable) {
+        return tastingRepo.findAll(pageable);
     }
 
     public List<Zubereitungsmethode> getAllZubereitungsmethoden() {
@@ -47,13 +47,20 @@ public class ServiceBarrista {
     }
 
 
-    //filterbyX für gefilterte Listen
+    //filter filter filter
+
+    //Filter Kaffeesorten für RoestereiDetailseite
+    public List<Kaffeesorte> getAllKaffeesortenByRoesterei(String roestereiName) {
+        return kaffeesorteRepo.findByRoestereiName(roestereiName);
+    }
+
+    //Filter für Listenseiten
 
     //Kaffeesorten
     public Page<Kaffeesorte> filterKaffeesorten(@Nullable String roestereiName, @Nullable String aromenProfil, Pageable pageable) {
-        Page<Kaffeesorte> allKaffeesorten = kaffeesorteRepo.findAll(pageable);
+        List<Kaffeesorte> allKaffeesortenList = kaffeesorteRepo.findAll();
 
-        List<Kaffeesorte> filteredList = allKaffeesorten.stream()
+        List<Kaffeesorte> filteredList = allKaffeesortenList.stream()
                 .filter(kaffeesorte ->
                         (roestereiName == null || kaffeesorte.getRoestereiName().equals(roestereiName))
                                 &&
@@ -61,11 +68,12 @@ public class ServiceBarrista {
                 )
                 .collect(Collectors.toList());
 
-        // Convert the filtered list back to a Page
-        return new PageImpl<>(filteredList, pageable, filteredList.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredList.size());
+        List<Kaffeesorte> paginatedList = filteredList.subList(start, end);
+
+        return new PageImpl<>(paginatedList, pageable, filteredList.size());
     }
-
-
 
     //Zubereitungsmethoden
     public List<Zubereitungsmethode> filterbyMethodenType (String methodenType){
@@ -73,46 +81,59 @@ public class ServiceBarrista {
     }
 
     //Tastings
-
-    public List<Tasting> filterTastings(@Nullable String zubereitungsmethodeName,
+    public Page<Tasting> filterTastings(@Nullable String zubereitungsmethodeName,
                                         @Nullable String kaffeesorteName,
-                                        @Nullable String bewertungFrontend) {
+                                        @Nullable String bewertungFrontend,
+                                        Pageable pageable) {
 
         List<Tasting> allTastings = tastingRepo.findAll();
 
         int startBewertung;
         int endBewertung;
 
-        if(bewertungFrontend != null) {
+        if (bewertungFrontend != null) {
             switch (bewertungFrontend) {
-                case "schlecht" -> {
+                case "schlecht":
                     startBewertung = 1;
                     endBewertung = 3;
-                }
-                case "mittel" -> {
+                    break;
+                case "mittel":
                     startBewertung = 4;
                     endBewertung = 6;
-                }
-                case "gut" -> {
+                    break;
+                case "gut":
                     startBewertung = 7;
                     endBewertung = 9;
-                }
-                case "top" -> {
+                    break;
+                case "top":
                     startBewertung = 10;
                     endBewertung = 10;
-                }
-                default -> throw new IllegalArgumentException("Invalid Bewertungsangabe: " + bewertungFrontend);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid Bewertungsangabe: " + bewertungFrontend);
             }
         } else {
             startBewertung = 1;
             endBewertung = 10;
         }
 
-        return allTastings.stream()
-                .filter(tasting -> (zubereitungsmethodeName == null || tasting.getZubereitungsmethodeName().equals(zubereitungsmethodeName))
-                        && (kaffeesorteName == null || tasting.getKaffeesorteName().equals(kaffeesorteName))
-                        && (tasting.getBewertung() >= startBewertung && tasting.getBewertung() <= endBewertung))
+        List<Tasting> filteredTastings = allTastings.stream()
+                .filter(tasting -> {
+                    String dbValue = tasting.getZubereitungsmethodeName().trim().toLowerCase();
+                    String filterValue = (zubereitungsmethodeName != null) ? zubereitungsmethodeName.trim().toLowerCase() : null;
+
+                    return (filterValue == null || dbValue.equals(filterValue))
+                            && (kaffeesorteName == null || tasting.getKaffeesorteName().trim().equalsIgnoreCase(kaffeesorteName.trim()))
+                            && (tasting.getBewertung() >= startBewertung && tasting.getBewertung() <= endBewertung);
+                })
                 .collect(Collectors.toList());
+
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), filteredTastings.size());
+        List<Tasting> paginatedList = filteredTastings.subList(start, end);
+
+        return new PageImpl<>(paginatedList, pageable, filteredTastings.size());
     }
 
     //getFilter für Filter-Dropdowns
@@ -154,7 +175,6 @@ public class ServiceBarrista {
     }
 
     //Methoden für Formulare, Add, Update, Delete
-
     //Kaffeesorte
     public Kaffeesorte addKaffeesorte(Kaffeesorte newKaffeesorte) throws KaffeesorteAlreadyExistsException {
         Optional<Kaffeesorte> existingKaffeesorte = kaffeesorteRepo.findByKaffeesorteNameAndRoestereiName(
@@ -174,13 +194,6 @@ public class ServiceBarrista {
                 () -> new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit der id: " + id + "Bitte versuche es noch einmal"));
         kaffeesorteRepo.deleteById(id);
         return removedKaffeesorte;
-    }
-
-    public Kaffeesorte deleteKaffeesorteByKaffeesorteName(String kaffeesorteName) throws KaffeesorteDoesNotExistException {
-        Kaffeesorte deletedKaffeesorte = kaffeesorteRepo.findByKaffeesorteName(kaffeesorteName).orElseThrow(
-                () -> new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit dem Namen: " + kaffeesorteName + "Bitte versuche es noch einmal"));
-        kaffeesorteRepo.deleteByKaffeesorteName(kaffeesorteName);
-        return deletedKaffeesorte;
     }
 
     public Kaffeesorte updateKaffeesorteById (String id, Kaffeesorte updateKaffeesorte) throws KaffeesorteDoesNotExistException {
@@ -269,6 +282,23 @@ public class ServiceBarrista {
         }
         updatedZubereitungsmethode.setId(id);
         return zubereitungsmethodeRepo.save(updatedZubereitungsmethode);
+    }
+
+    //Find individual Item for Detailseite
+
+    //Kaffeesorte
+    public Kaffeesorte getKaffeesorteById (String id) throws KaffeesorteDoesNotExistException {
+        return kaffeesorteRepo.findKaffeesorteById(id).orElseThrow(() -> new KaffeesorteDoesNotExistException("Es gibt keine Kaffeesorte mit der ID: " + id));
+    }
+
+    //Tasting
+    public Tasting getTastingById (String id) throws TastingDoesNotExistException {
+        return tastingRepo.findTastingById(id).orElseThrow(() -> new TastingDoesNotExistException("Es gibt keine Tasting mit der ID: " + id));
+    }
+
+    //Rösterei
+    public Roesterei getRoestereiByName (String roestereiName) throws RoestereiDoesNotExistException {
+        return roestereiRepo.findByRoestereiName(roestereiName).orElseThrow(() -> new RoestereiDoesNotExistException("Es gibt keine Rösterei mit dem Namen: " + roestereiName));
     }
 
 }
