@@ -9,5 +9,4 @@ import java.util.Optional;
 @Repository
 public interface RoestereiRepo extends MongoRepository<Roesterei,String> {
     Optional<Roesterei> findByRoestereiName(String roestereiName);
-
 }

@@ -6,7 +6,4 @@ public class RoestereiDoesNotExistException extends Exception {
         super(message);
     }
 
-    public RoestereiDoesNotExistException (String message, Throwable cause) {
-        super(message, cause);
-    }
 }

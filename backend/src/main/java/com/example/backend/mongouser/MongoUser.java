@@ -1,20 +1,20 @@
-package com.example.backend.data;
+package com.example.backend.mongouser;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document("Roesterei")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Roesterei {
-
+@Document("Users")
+@With
+public class MongoUser {
 
     private String id;
-    private String roestereiName;
-    private String roestereiBeschreibung;
-    private String fotoUrlRoesterei;
+    private String username;
+    private String password;
 
 }

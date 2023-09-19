@@ -3,13 +3,14 @@ package com.example.backend.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@Document("Zubereitungsmethode")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Zubereitungsmethode {
-    @Id
+
     private String id;
     private String zubereitungsmethodeName;
     private String barista;

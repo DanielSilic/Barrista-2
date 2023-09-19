@@ -6,31 +6,38 @@ import com.example.backend.data.Tasting;
 import com.example.backend.data.Zubereitungsmethode;
 import com.example.backend.exceptions.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin
 @RequestMapping("/barista")
 public class ControllerBarrista {
 
     private final ServiceBarrista serviceBarrista;
 
     //Listenseiten, getAll
-    @GetMapping("/kaffeesorten")
-    public List<Kaffeesorte> getAllKaffeesorten() {
-        return serviceBarrista.getAllKaffeesorten();
+    @GetMapping("/kaffeesorte")
+    public Page<Kaffeesorte> getAllKaffeesorten(Pageable pageable) {
+        return serviceBarrista.getAllKaffeesorten(pageable);
     }
 
-    @GetMapping("/roesterein")
+    @GetMapping("/roestereien")
     public List<Roesterei> getAllRoestereien(){
         return serviceBarrista.getAllRoestereien();
     }
 
     @GetMapping("/tastings")
-    public List<Tasting> getAllTastings(){
-        return serviceBarrista.getAllTastings();
+    public Page<Tasting> getAllTastings(Pageable pageable) {
+        return serviceBarrista.getAllTastings(pageable);
     }
 
     @GetMapping("/zubereitungsmethoden")
@@ -64,36 +71,55 @@ public class ControllerBarrista {
 
     //Kaffeesorten
     @GetMapping("/kaffeesorten/filter")
-    public List<Kaffeesorte> getFilteredKaffeesorten(
-            @RequestParam(value = "RoestereiName", required = false) String RoestereiName,
-            @RequestParam(value = "Aromenprofil", required = false) String Aromenprofil) {
+    public ResponseEntity<Map<String, Object>> getFilteredKaffeesorten(
+            @RequestParam(value = "roestereiName", required = false) String roestereiName,
+            @RequestParam(value = "aromenProfil", required = false) String aromenProfil,
+            Pageable pageable) {
 
-        List<Kaffeesorte> filteredKaffeesorten = serviceBarrista.filterKaffeesorten(RoestereiName, Aromenprofil);
+        Page<Kaffeesorte> page = serviceBarrista.filterKaffeesorten(roestereiName, aromenProfil, pageable);
 
-        return filteredKaffeesorten;
+        List<Kaffeesorte> kaffeesorten = page.getContent();
+        Map<String, Object> response = new HashMap<>();
+        response.put("kaffeesorten", kaffeesorten);
+        response.put("currentPage", page.getNumber());
+        response.put("totalItems", page.getTotalElements());
+        response.put("totalPages", page.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //Tastings
     @GetMapping("/tastings/filter")
-    public List<Tasting> filterTastings(
+    public ResponseEntity<Map<String, Object>> filterTastings(
             @RequestParam(required = false) String zubereitungsmethodeName,
             @RequestParam(required = false) String kaffeesorteName,
-            @RequestParam(required = false) String bewertungFrontend) {
+            @RequestParam(required = false) String bewertungFrontend,
+            Pageable pageable) {
 
-        List<Tasting> filteredTastings = serviceBarrista.filterTastings(zubereitungsmethodeName, kaffeesorteName, bewertungFrontend);
+        Page<Tasting> page = serviceBarrista.filterTastings(zubereitungsmethodeName, kaffeesorteName, bewertungFrontend, pageable);
 
-        return filteredTastings;
+        List<Tasting> tastings = page.getContent();
+        Map<String, Object> response = new HashMap<>();
+        response.put("tastings", tastings);
+        response.put("currentPage", page.getNumber());
+        response.put("totalItems", page.getTotalElements());
+        response.put("totalPages", page.getTotalPages());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     //Zubereitungsmethode
-    @GetMapping("/zubereitungsmethoden/filter")
-    public List<Zubereitungsmethode> filterZubereitungsmethode(
-            @RequestParam String methodenType){
-        List <Zubereitungsmethode> filteredZubereitungsmethode = serviceBarrista.filterbyMethodenType(methodenType);
-
-        return filteredZubereitungsmethode;
+    @GetMapping("/zubereitungsmethoden/methodentype")
+    public List<Zubereitungsmethode> findZMByMethodentype(@RequestParam String methodenType) {
+        return serviceBarrista.filterbyMethodenType(methodenType);
     }
 
+    //Liste von Kaffeesorten für RöstereiDetailseite
+    @GetMapping("/kaffeesorte/nachroesterei")
+    public List<Kaffeesorte> getAllKaffeesortenByRoesterei(
+            @RequestParam String roestereiName){
+        return serviceBarrista.getAllKaffeesortenByRoesterei (roestereiName);
+    }
 
     //Formularseiten
     //Kaffeesorte
@@ -108,7 +134,7 @@ public class ControllerBarrista {
         return serviceBarrista.deleteKaffeesorteById(id);
     }
 
-    @PutMapping("/kaffeesorte/{id}")
+    @PutMapping("/updatedkaffeesorte/{id}")
     public Kaffeesorte updateKaffeesorteById(@PathVariable String id, @RequestBody Kaffeesorte updatedKaffeesorte) throws KaffeesorteDoesNotExistException {
         return serviceBarrista.updateKaffeesorteById(id, updatedKaffeesorte);
     }
@@ -143,7 +169,7 @@ public class ControllerBarrista {
         return serviceBarrista.deleteTastingById(id);
     }
 
-    @PutMapping("/tasting/{id}")
+    @PutMapping("/updatedtasting/{id}")
     public Tasting updateTastingById(@PathVariable String id, @RequestBody Tasting updatedTasting) throws TastingDoesNotExistException {
         return serviceBarrista.updateTastingById(id, updatedTasting);
     }
@@ -163,6 +189,26 @@ public class ControllerBarrista {
     @PutMapping("/zubereitungsmethode/{id}")
     public Zubereitungsmethode updateZubereitungsmethodeById(@PathVariable String id, @RequestBody Zubereitungsmethode updatedZubereitungsmethode) throws ZubereitungsmethodeDoesNotExistException {
         return serviceBarrista.updateZubereitungsmethodeById(id, updatedZubereitungsmethode);
+    }
+
+    //Detailseiten
+
+    //Kaffeesorte
+    @GetMapping("/kaffeesorte/{id}")
+    public Kaffeesorte getKaffeesorteById(@PathVariable String id) throws KaffeesorteDoesNotExistException {
+        return serviceBarrista.getKaffeesorteById(id);
+    }
+
+    //Tasting
+    @GetMapping("/tasting/{id}")
+    public Tasting getTastingById(@PathVariable String id) throws TastingDoesNotExistException {
+        return serviceBarrista.getTastingById(id);
+    }
+
+    //Roesterei
+    @GetMapping("/roesterei/{roestereiName}")
+    public Roesterei getRoestereiById(@PathVariable String roestereiName) throws RoestereiDoesNotExistException {
+        return serviceBarrista.getRoestereiByName(roestereiName);
     }
 
 }
