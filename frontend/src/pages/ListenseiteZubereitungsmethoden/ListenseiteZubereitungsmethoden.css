@@ -1,0 +1,31 @@
+.img-fluid.rounded-circle {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.zubereitungsmethoden-list {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.zubereitungsmethoden-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+}
+
+.coffee-icon {
+    font-size: 24px;
+    color: #6b705c;
+}
+
+.zubereitungsmethode-details {
+    flex: 1;
+}
+
+

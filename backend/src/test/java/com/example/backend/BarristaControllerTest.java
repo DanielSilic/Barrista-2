@@ -108,9 +108,6 @@ public class BarristaControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
-
-
-
     @DirtiesContext
     @Test
     @WithMockUser(username = "Dan", password = "123")
@@ -296,8 +293,6 @@ public class BarristaControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.freezingDate", Matchers.is("FreezingDateA")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fotoUrlKaffeesorte", Matchers.is("FotoUrlKaffeesorteA")));
     }
-
-
 
 
 }

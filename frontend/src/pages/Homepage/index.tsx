@@ -1,35 +1,50 @@
-import { Button } from 'react-bootstrap';
 import './homepage.css'
 import { Link } from 'react-router-dom';
+import '../../index.css'
+export default function Homepage() {
 
-
-
-export function Homepage() {
     return (
-        <div className="buttons-container">
-            <Link to="/ListenseiteKaffeesorten/index">
-                <Button variant="outline-light" size="lg" className="responsive-text">
-                Kaffeesorten
-                </Button>
-            </Link>
-            <Link to="/ListenseiteRoestereien/index">
-                <Button variant="outline-light" size="lg" className="responsive-text">
-                Kaffeeröstereien
-                </Button>
-            </Link>
-            <Link to="/ListenseiteTaistings/index">
-                <Button variant="outline-light" size="lg" className="responsive-text">
-                Tastings
-                </Button>
-            </Link>
-            <Link to="ListenseiteZubereitungsmethoden/index">
-                <Button variant="outline-light" size="lg" className="responsive-text">
-                Zubereitungs<br />methoden
-                </Button>
-            </Link>    
+        <div className="homepage-grid-container">
+            <div className="buttons-container">
+                <Link className="btn" to="/ListenseiteKaffeesorten/index">
+                    <div className="navi-card">
+                        <h3>Kaffeesorten</h3>
+                    </div>
+                </Link>
+                <Link className="btn" to="/ListenseiteRoestereien/index">
+                    <div className="navi-card">
+                        <h3>Kaffeeröstereien</h3>
+                    </div>
+                </Link>
+                <Link className="btn" to="/ListenseiteTastings/index">
+                    <div className="navi-card">
+                        <h3>Brews</h3>
+                    </div>
+                </Link>
+                <Link className="btn" to="/ListenseiteZubereitungsmethoden/index">
+                    <div className="navi-card">
+                        <h3>Zubereitungsmethoden</h3>
+                    </div>
+                </Link>
+            </div>
+            <div className="add-buttons-container">
+                <Link className="add-btn" to="/Form/Add/Kaffeesorte">
+                    <div className="navi-card">
+                        <h3>Neue Bohnen in der Rösterei?</h3>
+                    </div>
+                </Link>
+                <Link className="add-btn" to="/Form/Add/Tasting">
+                    <div className="navi-card">
+                        <h3>Frischer Kaffee in der Tasse?</h3>
+                    </div>
+                </Link>
+            </div>
         </div>
-    );
+    )
 }
+
+
+
 
 
 

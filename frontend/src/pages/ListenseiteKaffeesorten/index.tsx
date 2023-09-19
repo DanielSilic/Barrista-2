@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { BiSolidCoffeeBean } from "react-icons/bi";
+import { MdWarehouse } from "react-icons/md";
+import { BsFillCupHotFill } from "react-icons/bs"
 import "./listenseitekaffeesorten.css";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
+import { Link } from 'react-router-dom';
 
 
-type Kaffeesorte = {
+interface Kaffeesorte {
     id: string;
     kaffeesorteName: string;
     roestereiName: string;
@@ -15,82 +17,134 @@ type Kaffeesorte = {
     aromenProfil: string;
     koerper: string;
     suesse: string;
-};
+}
 
-type FilteredKaffeesortenResponse = {
-    content: Kaffeesorte[];
-};
-
- export default function ListenseiteKaffeesorten () {
+function KaffeesortenList () {
     const [kaffeesorten, setKaffeesorten] = useState<Kaffeesorte[]>([]);
-    const [page, setPage] = useState(1);
-    const [aromenProfil, setAromenProfil] = useState("");
-    const [roestereiName, setRoestereiName] = useState("");
     const [roestereiOptions, setRoestereiOptions] = useState<string[]>([]);
+    const [aromenProfil, setAromenProfil] = useState<string>('');
+    const [roestereiName, setRoestereiName] = useState<string>('');
 
-     useEffect(() => {
-         axios.get<string[]>("/barista/dropdown/roestereiname")
-             .then((response: { data: string[] }) => setRoestereiOptions(response.data))
-             .catch((err: AxiosError) => console.error(err.message));
-     }, []);
-
-     const loadKaffeesorten = () => {
-         axios.get<FilteredKaffeesortenResponse>(`/barista/kaffeesorten/filter?page=${page}&RoestereiName=${roestereiName}&Aromenprofil=${aromenProfil}`)
-             .then((response: { data: FilteredKaffeesortenResponse }) => {
-                 setKaffeesorten(prevKaffeesorten => [...prevKaffeesorten, ...response.data.content]);
-                 setPage(prevPage => prevPage + 1);
-             })
-             .catch((err: AxiosError) => console.error(err.message));
-     };
+    const [totalItems, setTotalItems] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
 
 
-     const handleFilter = () => {
-        setPage(1);
-        setKaffeesorten([]);
-        loadKaffeesorten();
+    // Fetch initial data
+    useEffect(() => {
+        axios.get('http://localhost:8080/barista/kaffeesorte').then((res) => {
+            setKaffeesorten(res.data.content);
+        });
+        axios.get('http://localhost:8080/barista/dropdown/roestereiname').then((res) => {
+            setRoestereiOptions(res.data);
+        });
+    }, []);
+
+
+    const handleFilter = () => {
+
+        const params: Record<string, string | number> = {
+            page: 0,
+            size: 10
+        };
+
+        if (roestereiName) {
+            params.roestereiName = roestereiName;
+        }
+
+        if (aromenProfil) {
+            params.aromenProfil = aromenProfil;
+        }
+
+        console.log("Sending params:", params);  // Debug line
+
+        axios.get('http://localhost:8080/barista/kaffeesorten/filter', {params})
+            .then(response => {
+                setKaffeesorten(response.data.kaffeesorten);
+                setTotalItems(response.data.totalItems);
+                setCurrentPage(0);
+            });
+
+    };
+
+    const loadMore = () => {
+        const nextPage = currentPage + 1;
+
+        const params: Record<string, string | number> = {
+            page: nextPage,
+            size: 10
+        };
+
+        if (roestereiName) {
+            params.roestereiName = roestereiName;
+        }
+
+        if (aromenProfil) {
+            params.aromenProfil = aromenProfil;
+        }
+
+        axios.get('http://localhost:8080/barista/kaffeesorten/filter', { params })
+            .then((res) => {
+                setKaffeesorten((prevKaffeesorten) => [...prevKaffeesorten, ...res.data.kaffeesorten]);
+                setTotalItems(res.data.totalItems);  // new line
+                setCurrentPage(nextPage);
+            });
     };
 
     return (
-        <div className="kaffeesorte-filter-liste">
+        <div>
             <div className="filter-dashboard">
                 <select value={aromenProfil} onChange={(e) => setAromenProfil(e.target.value)}>
-                    <option value="">-- Aromenprofil --</option>
-                    {["blumig", "fruchtig", "komplex-fruchtig", "karamell", "klassisch-dunkel", "ausgewogen"].map(option => (
-                        <option key={option} value={option}>{option}</option>
+                    <option value="">Aromenprofil</option>
+                    {['blumig', 'fruchtig', 'komplex-fruchtig', 'karamell', 'klassisch-dunkel', 'ausgewogen'].map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
                     ))}
                 </select>
 
                 <select value={roestereiName} onChange={(e) => setRoestereiName(e.target.value)}>
-                    <option value="">-- Rösterei --</option>
-                    {roestereiOptions.map(option => (
-                        <option key={option} value={option}>{option}</option>
+                    <option value="">Rösterei</option>
+                    {roestereiOptions.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
                     ))}
                 </select>
 
-                <button onClick={handleFilter}>Filtern</button>
+                <button className="filter-button" onClick={handleFilter}>Filtern</button>
             </div>
 
             <div className="kaffeesorten-list">
-                {kaffeesorten.map(kaffeesorte => (
+                {kaffeesorten.map((kaffeesorte) => (
                     <div className="kaffeesorte-card" key={kaffeesorte.id}>
-                        <BiSolidCoffeeBean className="coffee-icon" />
                         <div className="kaffeesorte-details">
                             <h3>{kaffeesorte.kaffeesorteName}</h3>
-                            <p>{kaffeesorte.roestereiName}</p>
-                            <p>{kaffeesorte.aromenProfil}</p>
+                            <p>
+                                <MdWarehouse /> {kaffeesorte.roestereiName}
+                            </p>
+                            <p>
+                                <BsFillCupHotFill /> {kaffeesorte.aromenProfil}
+                            </p>
                         </div>
                         <div className="card-actions">
-                            <button>Bearbeiten</button>
-                            <button>Löschen</button>
+                            <Link to={`/Detailseiten/Kaffeesorte/detail/${kaffeesorte.id}`}>
+                                <button className="border-button">Details</button>
+                            </Link>
                         </div>
                     </div>
                 ))}
             </div>
-
-            <button onClick={loadKaffeesorten}>Mehr anzeigen</button>
+            <div className="load-more-container">
+                <button
+                    disabled={totalItems <= kaffeesorten.length}
+                    onClick={loadMore}
+                    className={`load-more ${totalItems <= kaffeesorten.length ? 'load-more-secondary' : 'load-more-primary'}`}
+                >
+                    Mehr anzeigen
+                </button>
+            </div>
         </div>
     );
 }
 
-
-
+export default KaffeesortenList;
