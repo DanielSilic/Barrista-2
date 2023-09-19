@@ -14,7 +14,7 @@ function ListenseiteR () {
     const [roesterei, setRoesterei] = useState<Roesterei[]>([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/barista/roestereien").then((response) => {
+        axios.get("/barista/roestereien").then((response) => {
             setRoesterei(response.data);
         });
     }, []);

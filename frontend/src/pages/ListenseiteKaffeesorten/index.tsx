@@ -82,7 +82,7 @@ function KaffeesortenList () {
             params.aromenProfil = aromenProfil;
         }
 
-        axios.get('http://localhost:8080/barista/kaffeesorten/filter', { params })
+        axios.get('/barista/kaffeesorten/filter', { params })
             .then((res) => {
                 setKaffeesorten((prevKaffeesorten) => [...prevKaffeesorten, ...res.data.kaffeesorten]);
                 setTotalItems(res.data.totalItems);  // new line

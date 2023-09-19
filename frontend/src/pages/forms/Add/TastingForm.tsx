@@ -24,7 +24,7 @@ function TastingForm () {
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/barista/dropdown/kaffeesortename')
+        axios.get('/barista/dropdown/kaffeesortename')
             .then(response => {
                 setKaffeesorteNames(response.data);
             })
@@ -34,7 +34,7 @@ function TastingForm () {
     }, []);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/barista/dropdown/zubereitungsmethodennamen")
+        axios.get("/barista/dropdown/zubereitungsmethodennamen")
             .then(response => {
                 setZubereitungsmethodeNames(response.data);
             })
@@ -61,7 +61,7 @@ function TastingForm () {
             anmerkungen
         };
 
-        axios.post('http://localhost:8080/barista/tasting', newTasting)
+        axios.post('/barista/tasting', newTasting)
             .then(response => {
                 console.log('Ist in der DB', response.data);
 

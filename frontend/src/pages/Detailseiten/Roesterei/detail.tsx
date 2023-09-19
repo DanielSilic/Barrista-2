@@ -38,8 +38,8 @@ function DetailseiteRoesterei() {
     const [kaffeesorten, setKaffeesorten] = useState<Kaffeesorte[]>([]);
 
     useEffect(() => {
-        const apiUrlRoesterei = `http://localhost:8080/barista/roesterei/${roestereiName}`;
-        const apiUrlKaffeesorten = `http://localhost:8080/barista/kaffeesorte/nachroesterei?roestereiName=${roestereiName}`;
+        const apiUrlRoesterei = `/barista/roesterei/${roestereiName}`;
+        const apiUrlKaffeesorten = `/barista/kaffeesorte/nachroesterei?roestereiName=${roestereiName}`;
 
         axios.get(apiUrlRoesterei)
             .then(response => {

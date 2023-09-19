@@ -17,16 +17,16 @@ const ZubereitungsmethodeList: React.FC = () => {
     const [methodenTypeOptions, setMethodenTypeOptions] = useState<string[]>([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/barista/dropdown/methodentype').then(response => {
+        axios.get('/barista/dropdown/methodentype').then(response => {
             setMethodenTypeOptions(response.data);
         });
-        axios.get("http://localhost:8080/barista/zubereitungsmethoden").then((response) => {
+        axios.get("/barista/zubereitungsmethoden").then((response) => {
             setZubereitungsmethoden(response.data);
         });
     }, []);
 
     const handleFilter = () => {
-        axios.get(`http://localhost:8080/barista/zubereitungsmethoden/methodentype?methodenType=${methodenType}`).then(response => {
+        axios.get(`/barista/zubereitungsmethoden/methodentype?methodenType=${methodenType}`).then(response => {
             setZubereitungsmethoden(response.data);
         });
     };

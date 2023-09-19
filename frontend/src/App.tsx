@@ -4,7 +4,7 @@ import ListenseiteKaffeesorten from './pages/ListenseiteKaffeesorten';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AddKaffeesorteForm from "./pages/forms/Add/Kaffeesorten.tsx";
 import TastingForm from "./pages/forms/Add/TastingForm.tsx";
-import TastingListe from "./pages/ListenseiteTastings";
+import TastingListe from "./pages/ListenseiteTastings/ListenseiteTastings.tsx";
 import ListenseiteZM from "./pages/ListenseiteZubereitungsmethoden";
 import ListenseiteR from "./pages/ListenseiteRoestereien";
 import DetailseiteKaffeesorte from "./pages/Detailseiten/Kaffeesorte/detail.tsx";
@@ -16,11 +16,12 @@ import Header from "./Header/Header.tsx";
 import ProtectedRoute from "./ProtectedRoutes.tsx";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
+import {useState} from "react";
 
 function App() {
+    const [user, setUser] = useState("")
 
     return (
-
         <Router>
             <Header />
             <Routes>
@@ -40,9 +41,11 @@ function App() {
                     <Route path="/Detailseiten/Kaffeesorte/detail/:id" element={<DetailseiteKaffeesorte />} />
                     <Route path="/Detailseiten/Tasting/detail/:id" element={<DetailseiteTasting/>} />
                     <Route path="/Detailseiten/Roesterei/detail/:roestereiName" element={<DetailseiteRoesterei />} />
+                </Route>
             </Routes>
         </Router>
-);
+
+    );
 }
 
 export default App;

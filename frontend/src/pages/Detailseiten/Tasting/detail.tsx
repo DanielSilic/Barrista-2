@@ -45,7 +45,7 @@ function DetailseiteTasting () {
     const [tasting, setTasting] = useState<Tasting | null>(null);
 
     useEffect(() => {
-        const apiUrl = `http://localhost:8080/barista/tasting/${id}`;
+        const apiUrl = `/barista/tasting/${id}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -69,7 +69,7 @@ function DetailseiteTasting () {
     };
 
     const deleteTasting = () => {
-        axios.delete(`http://localhost:8080/barista/tasting/${id}`)
+        axios.delete(`/barista/tasting/${id}`)
             .then((response) => {
                 // Handle successful deletion here (e.g., redirect to another page)
                 console.log('Die Tasse ist ausgeschüttet:', response);

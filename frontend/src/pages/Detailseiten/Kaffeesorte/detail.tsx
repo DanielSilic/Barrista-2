@@ -50,7 +50,7 @@ function DetailseiteKaffeesorte () {
     const [kaffeesorte, setKaffeesorte] = useState<Kaffeesorte | null>(null);
 
     useEffect(() => {
-        const apiUrl = `http://localhost:8080/barista/kaffeesorte/${id}`;
+        const apiUrl = `/barista/kaffeesorte/${id}`;
 
         axios.get(apiUrl)
             .then(response => {
@@ -74,7 +74,7 @@ function DetailseiteKaffeesorte () {
     };
 
     const deleteKaffeesorte = () => {
-        axios.delete(`http://localhost:8080/barista/kaffeesorte/${id}`)
+        axios.delete(`/barista/kaffeesorte/${id}`)
             .then((response) => {
                 // Handle successful deletion here (e.g., redirect to another page)
                 console.log('Die Bohnen haben nun ausgebohnt:', response);

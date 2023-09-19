@@ -27,21 +27,21 @@ function EditTastingForm (){
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/barista/dropdown/kaffeesortename')
+        axios.get('/barista/dropdown/kaffeesortename')
             .then(response => {
                 setKaffeesorteNames(response.data);
             })
     }, []);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/barista/dropdown/zubereitungsmethodennamen")
+        axios.get("/barista/dropdown/zubereitungsmethodennamen")
             .then(response => {
                 setZubereitungsmethodeNames(response.data);
             })
     },[]);
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/barista/tasting/${id}`)
+        axios.get(`/barista/tasting/${id}`)
             .then(response => {
                 const TastingData = response.data;
 
@@ -80,7 +80,7 @@ function EditTastingForm (){
             anmerkungen
         };
 
-        axios.put(`http://localhost:8080/barista/updatedtasting/${id}`, updatedTasting)
+        axios.put(`/barista/updatedtasting/${id}`, updatedTasting)
             .then(() => {
                 setSuccessMsg('Bearbeitung erfolgreich gespeichert');
             })

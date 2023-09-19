@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from 'react-router-dom';
-import "./listenseiteTastings.css";
+import "./ListenseiteTastings.css";
 
 interface Tasting {
     id: string;
@@ -23,13 +23,13 @@ function TastingListe() {
     const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/barista/tastings').then((res) => {
+        axios.get('/barista/tastings').then((res) => {
             setTastings(res.data.content);
         });
-        axios.get('http://localhost:8080/barista/dropdown/kaffeesortename').then((res) => {
+        axios.get('/barista/dropdown/kaffeesortename').then((res) => {
             setKaffeesorteOptions(res.data);
         });
-        axios.get('http://localhost:8080/barista/dropdown/zubereitungsmethodennamen').then((res) => {
+        axios.get('/barista/dropdown/zubereitungsmethodennamen').then((res) => {
             setMethodeOptions(res.data);
         });
     }, []);
