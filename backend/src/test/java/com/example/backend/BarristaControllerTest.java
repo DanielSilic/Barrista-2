@@ -166,7 +166,7 @@ public class BarristaControllerTest {
 
         kaffeesorteRepo.save(originalKaffeesorte);
 
-        mvc.perform(MockMvcRequestBuilders.put("/barista/kaffeesorte/123456")
+        mvc.perform(MockMvcRequestBuilders.put("/barista/updatedkaffeesorte/123456")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                                 """
