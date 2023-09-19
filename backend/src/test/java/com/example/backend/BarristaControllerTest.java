@@ -262,10 +262,10 @@ public class BarristaControllerTest {
                         .param("bewertungFrontend", "mittel")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].tastingName", Matchers.is("TastingA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].zubereitungsmethodeName", Matchers.is("ZubereitungA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].bewertung", Matchers.is(5)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].tastingName", Matchers.is("TastingA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].zubereitungsmethodeName", Matchers.is("ZubereitungA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].bewertung", Matchers.is(5)));
     }
 
     @Test
