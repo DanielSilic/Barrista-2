@@ -75,14 +75,12 @@ function TastingForm () {
                 setBewertung(0);
                 setAnmerkungen('');
 
-                setSuccessMsg('Danke! Dein Tasting ist nun in der Tasse.');
+                setSuccessMsg('Danke! Dein Brew ist nun in der Tasse.');
             })
             .catch(error => {
                 setErrorMsg('Ups, da ist leider was schief gelaufen. Versuche es später noch einmal!');
                 console.error('Ups, da ist leider was schief gelaufen. Versuche es später noch einmal!', error);
             });
-
-
     }
 
     return (

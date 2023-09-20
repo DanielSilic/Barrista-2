@@ -31,10 +31,10 @@ function KaffeesortenList () {
 
     // Fetch initial data
     useEffect(() => {
-        axios.get('http://localhost:8080/barista/kaffeesorte').then((res) => {
+        axios.get('/barista/kaffeesorte').then((res) => {
             setKaffeesorten(res.data.content);
         });
-        axios.get('http://localhost:8080/barista/dropdown/roestereiname').then((res) => {
+        axios.get('/barista/dropdown/roestereiname').then((res) => {
             setRoestereiOptions(res.data);
         });
     }, []);
@@ -55,9 +55,9 @@ function KaffeesortenList () {
             params.aromenProfil = aromenProfil;
         }
 
-        console.log("Sending params:", params);  // Debug line
+        console.log("Sending params:", params);  // Debug
 
-        axios.get('http://localhost:8080/barista/kaffeesorten/filter', {params})
+        axios.get('/barista/kaffeesorten/filter', {params})
             .then(response => {
                 setKaffeesorten(response.data.kaffeesorten);
                 setTotalItems(response.data.totalItems);

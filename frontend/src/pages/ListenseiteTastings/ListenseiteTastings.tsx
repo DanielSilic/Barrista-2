@@ -52,7 +52,7 @@ function TastingListe() {
             params.bewertungFrontend = bewertungFrontend;
         }
 
-        axios.get('http://localhost:8080/barista/tastings/filter', { params })
+        axios.get('/barista/tastings/filter', { params })
             .then(response => {
                 setTastings(response.data.tastings);
                 setTotalItems(response.data.totalItems);
@@ -79,7 +79,7 @@ function TastingListe() {
             params.bewertungFrontend = bewertungFrontend;
         }
 
-        axios.get('http://localhost:8080/barista/tastings/filter', { params })
+        axios.get('/barista/tastings/filter', { params })
             .then((res) => {
                 setTastings((prevTastings) => [...prevTastings, ...res.data.tastings]);
                 setTotalItems(res.data.totalItems);

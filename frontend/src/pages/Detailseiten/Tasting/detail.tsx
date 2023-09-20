@@ -71,7 +71,6 @@ function DetailseiteTasting () {
     const deleteTasting = () => {
         axios.delete(`/barista/tasting/${id}`)
             .then((response) => {
-                // Handle successful deletion here (e.g., redirect to another page)
                 console.log('Die Tasse ist ausgeschüttet:', response);
                 closeModal();
                 navigate(`/ListenseiteKaffeesorten/index`);
@@ -85,16 +84,18 @@ function DetailseiteTasting () {
     return (
         <div className="text-center">
             <Card style={{ width: '30rem', margin: '0 auto' }}>
-                <div className="image-container"></div>
+                <div className="image-container">
+                    <img src="/picture_for_brew_450_300.jpg" alt="Coffee Detail" className="coffee-image" />
+                </div>
                 <Card.Body>
                     <div className="kaffeesorte-header">
                         {tasting.tastingName}
                     </div>
                     <div className="card-indented-text">
-                        Kaffeesorte Name: <span className="subtitle-text">{tasting.kaffeesorteName}</span>
+                        Kaffeesorte: <span className="subtitle-text">{tasting.kaffeesorteName}</span>
                     </div>
                     <div className="card-indented-text">
-                        Zubereitungsmethode Name: <span className="subtitle-text">{tasting.zubereitungsmethodeName}</span>
+                        Zubereitungsmethode: <span className="subtitle-text">{tasting.zubereitungsmethodeName}</span>
                     </div>
                     <div className="card-indented-text">
                         Mahlgrad: <span className="subtitle-text">{tasting.mahlgrad}</span>

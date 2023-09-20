@@ -162,14 +162,19 @@ input[type="text"], input[type="password"] {
 /*Detailseiten*/
 
 .image-container {
-    background-image: url("/picture_for_coffee_detail_page.jpg");
-    background-size: cover;
-    background-position: center;
-    width: 450px;
-    height: 300px;
-    border-radius: 20px;
-    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
+
+.coffee-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 20px;
+    width: 450px;
+}
+
 
 .kaffeesorte-header {
     font-size: 24px;
@@ -213,7 +218,7 @@ input[type="text"], input[type="password"] {
     padding: 5px 10px;
 }
 
-/*Formseite Kaffee Add */
+/*Formseite Add */
 .data-block {
     width: 150px;
     text-align: right;
@@ -263,7 +268,11 @@ input[type="text"], input[type="password"] {
     margin-right: 5px;
 }
 
-/*Formseite edit Tastings/Brews*/
+/*Formseite edit Tastings/Brews/Kaffeesorte*/
+.container {
+    margin-top: 35px;
+}
+
 .bewertung-label {
     width: 150px;
     text-align: right;
@@ -292,6 +301,28 @@ input[type="text"], input[type="password"] {
     align-items: center;
     width: 100%;
 }
+
+/*Botton Menu-Bar*/
+.bottom-menu-bar {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #242424;
+    padding: 10px;
+    border-top: 1px solid #7c736b;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+}
+
+.menu-item p {
+    margin-left: 8px;
+}
+
 
 
 @media only screen
@@ -374,7 +405,7 @@ and (-webkit-device-pixel-ratio: 3) {
         background-image: url("/picture_for_coffee_detail_page.jpg");
         background-size: cover;
         background-position: center;
-        width: 320px;
+        width: 350px;
         height: 300px;
         border-radius: 20px;
         margin-bottom: 30px;
@@ -399,6 +430,16 @@ and (-webkit-device-pixel-ratio: 3) {
     .detail-button {
         width: auto;
         padding: 5px 10px;
+    }
+
+    /*Botton Bar*/
+    .bottom-menu-bar {
+        padding: 12px;
+    }
+
+    .menu-item p {
+        margin-left: 10px;
+        font-size: 16px;
     }
 }
 

@@ -1,205 +1,226 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Button, Form, Alert } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
 
-function TastingForm () {
 
-    //required
-    const [tastingName, setTastingName] = useState('');
-    const [kaffeesorteNames, setKaffeesorteNames] = useState([]);
-    const [selectedKaffeesorteName, setSelectedKaffeesorteName] = useState('');
-    const [zubereitungsmethodeNames, setZubereitungsmethodeNames] = useState([]);
-    const [selectedZubereitungsmethodeName, setSelectedZubereitungsmethodeName] = useState('');
+function EditKaffeesorteForm() {
+    const { id } = useParams();
+    const navigate = useNavigate();
 
-    //optional
-    const [mahlgrad, setMahlgrad] = useState('');
-    const [wassersorte, setWassersorte] = useState('');
-    const [wassertemperatur, setWassertemperatur] = useState('');
-    const [ergebnis, setErgebnis] = useState('');
-    const [bewertung, setBewertung] = useState(0);
-    const [anmerkungen, setAnmerkungen] = useState('');
 
-    //messages
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [kaffeesorteName, setKaffeesorteName] = useState<string>('');
+    const [roestereiNames, setRoestereiNames] = useState<string[]>([]);
+    const [selectedRoestereiName, setSelectedRoestereiName] = useState<string>('');
+    const [variety, setVariety] = useState<string>('');
+    const [aufbereitung, setAufbereitung] = useState<string>('');
+    const [herkunftsland, setHerkunftsland] = useState<string>('');
+    const [aromenProfil, setAromenProfil] = useState<string>('');
+
+    const [aromen, setAromen] = useState<string>('');
+    const [koerper, setKoerper] = useState<string>('');
+    const [suessse, setSuessse] = useState<string>('');
+    const [geschmacksnotenHeiss, setGeschmacksnotenHeiss] = useState<string>('');
+    const [geschmacksnotenMedium, setGeschmacksnotenMedium] = useState<string>('');
+    const [geschmacksnotenKalt, setGeschmacksnotenKalt] = useState<string>('');
+    const [freezingDate, setFreezingDate] = useState<string>('');
+    const [fotoUrlKaffeesorte, setFotoUrlKaffeesorte] = useState<string>('');
+
+    const [errorMsg, setErrorMsg] = useState<string>('');
+    const [successMsg, setSuccessMsg] = useState<string>('');
 
     useEffect(() => {
-        axios.get('/barista/dropdown/kaffeesortename')
+        axios.get('/barista/dropdown/roestereiname')
             .then(response => {
-                setKaffeesorteNames(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
+                setRoestereiNames(response.data);
             });
     }, []);
 
     useEffect(() => {
-        axios.get("/barista/dropdown/zubereitungsmethodennamen")
+        axios.get(`/barista/kaffeesorte/${id}`)
             .then(response => {
-                setZubereitungsmethodeNames(response.data);
+                const kaffeesorteData = response.data;
+
+                setKaffeesorteName(kaffeesorteData.kaffeesorteName);
+                setSelectedRoestereiName(kaffeesorteData.roestereiName);
+                setVariety(kaffeesorteData.variety);
+                setAufbereitung(kaffeesorteData.aufbereitung);
+                setHerkunftsland(kaffeesorteData.herkunftsland);
+                setAromenProfil(kaffeesorteData.aromenProfil);
+                setAromen(kaffeesorteData.aromen);
+                setKoerper(kaffeesorteData.koerper);
+                setSuessse(kaffeesorteData.suessse);
+                setGeschmacksnotenHeiss(kaffeesorteData.geschmacksnotenHeiss);
+                setGeschmacksnotenMedium(kaffeesorteData.geschmacksnotenMedium);
+                setGeschmacksnotenKalt(kaffeesorteData.geschmacksnotenKalt);
+                setFreezingDate(kaffeesorteData.freezingDate);
+                setFotoUrlKaffeesorte(kaffeesorteData.fotoUrlKaffeesorte);
             })
             .catch(error => {
-                console.error('Error fetching data:', error)
-            })
-    },[]);
+                console.error("Die Daten konnten nicht geladen werden", error);
+            });
+    }, [id]);
 
     const handleSubmit = () => {
-        if (!tastingName || !selectedKaffeesorteName || !selectedZubereitungsmethodeName) {
-            setErrorMsg("Bitte fülle alle Felder aus, die mit * markiert sind.");
+        if (!kaffeesorteName ||
+            !selectedRoestereiName ||
+            !variety ||
+            !aufbereitung ||
+            !herkunftsland ||
+            !aromenProfil) {
+            setErrorMsg('Bitte fülle alle Felder mit * aus.');
             return;
         }
 
-        const newTasting = {
-            tastingName,
-            kaffeesorteName: selectedKaffeesorteName,
-            zubereitungsmethodeName: selectedZubereitungsmethodeName,
-            mahlgrad,
-            wassersorte,
-            wassertemperatur,
-            ergebnis,
-            bewertung,
-            anmerkungen
+        const updatedKaffeesorte = {
+            kaffeesorteName,
+            roestereiName: selectedRoestereiName,
+            variety,
+            aufbereitung,
+            herkunftsland,
+            aromenProfil,
+            aromen,
+            koerper,
+            suessse,
+            geschmacksnotenHeiss,
+            geschmacksnotenMedium,
+            geschmacksnotenKalt,
+            freezingDate,
+            fotoUrlKaffeesorte,
         };
 
-        axios.post('/barista/tasting', newTasting)
-            .then(response => {
-                console.log('Ist in der DB', response.data);
-
-                setTastingName('');
-                setSelectedKaffeesorteName('');
-                setSelectedZubereitungsmethodeName('');
-                setMahlgrad('');
-                setWassersorte('');
-                setWassertemperatur('');
-                setErgebnis('');
-                setBewertung(0);
-                setAnmerkungen('');
-
-                setSuccessMsg('Danke! Dein Tasting ist nun in der Tasse.');
+        axios.put(`/barista/updatedkaffeesorte/${id}`, updatedKaffeesorte)
+            .then(() => {
+                setSuccessMsg('Bearbeitung erfolgreich gespeichert');
             })
-            .catch(error => {
-                setErrorMsg('Ups, da ist leider was schief gelaufen. Versuche es später noch einmal!');
-                console.error('Ups, da ist leider was schief gelaufen. Versuche es später noch einmal!', error);
+            .catch(() => {
+                setErrorMsg('Die Bearbeitung konnte nicht gespeichert werden');
             });
+    };
 
-
-    }
+    const navigateToDetailPage = () => {
+        navigate(`/Detailseiten/Kaffeesorte/detail/${id}`);
+    };
 
     return (
-        <Form>
-            <Form.Group controlId="tastingName">
-                <Form.Label>Tasting Name *</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={tastingName}
-                    onChange={e => setTastingName(e.target.value)}
-                    required
-                />
-            </Form.Group>
+        <div className="container">
+            <div className="row justify-content-center">
+                <div className="col-md-6">
+                    <Form className="container">
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="kaffeesorteName">
+                            <Form.Label className="data-block">Kaffeesorte*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={kaffeesorteName}
+                                onChange={e => setKaffeesorteName(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="kaffeesorteName">
-                <Form.Label>Kaffeesorte Name *</Form.Label>
-                <Form.Control
-                    as="select"
-                    value={selectedKaffeesorteName}
-                    onChange={e => setSelectedKaffeesorteName(e.target.value)}
-                    required
-                >
-                    <option value="">--Select--</option>
-                    {kaffeesorteNames.map((name, index) => (
-                        <option key={index} value={name}>
-                            {name}
-                        </option>
-                    ))}
-                </Form.Control>
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi formgroup-select-custom" controlId="roestereiName">
+                            <Form.Label className="data-block">Rösterei*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                as="select"
+                                value={selectedRoestereiName}
+                                onChange={e => setSelectedRoestereiName(e.target.value)}
+                            >
+                                {roestereiNames.map(name => <option key={name} value={name}>{name}</option>)}
+                            </Form.Control>
+                        </Form.Group>
 
-            <Form.Group controlId="zubereitungsmethodeName">
-                <Form.Label>Zubereitungsmethode Name *</Form.Label>
-                <Form.Control
-                    as="select"
-                    value={selectedZubereitungsmethodeName}
-                    onChange={e => setSelectedZubereitungsmethodeName(e.target.value)}
-                    required
-                >
-                    <option value="">--Select--</option>
-                    {zubereitungsmethodeNames.map((name, index) => (
-                        <option key={index} value={name}>
-                            {name}
-                        </option>
-                    ))}
-                </Form.Control>
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="variety">
+                            <Form.Label className="data-block">Variety*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={variety}
+                                onChange={e => setVariety(e.target.value)}
+                            />
+                        </Form.Group>
 
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="aufbereitung">
+                            <Form.Label className="data-block">Aufbereitung*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={aufbereitung}
+                                onChange={e => setAufbereitung(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="mahlgrad">
-                <Form.Label>Mahlgrad</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={mahlgrad}
-                    onChange={e => setMahlgrad(e.target.value)}
-                />
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="herkunftsland">
+                            <Form.Label className="data-block">Herkunftsland*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={herkunftsland}
+                                onChange={e => setHerkunftsland(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="wassersorte">
-                <Form.Label>Wassersorte</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={wassersorte}
-                    onChange={e => setWassersorte(e.target.value)}
-                />
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="aromenProfil">
+                            <Form.Label className="data-block">Aromenprofil*</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={aromenProfil}
+                                onChange={e => setAromenProfil(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="wassertemperatur">
-                <Form.Label>Wassertemperatur</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={wassertemperatur}
-                    onChange={e => setWassertemperatur(e.target.value)}
-                />
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="aromen">
+                            <Form.Label className="data-block">Aromen</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={aromen}
+                                onChange={e => setAromen(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="ergebnis">
-                <Form.Label>Ergebnis</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={ergebnis}
-                    onChange={e => setErgebnis(e.target.value)}
-                />
-            </Form.Group>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="koerper">
+                            <Form.Label className="data-block">Körper</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={koerper}
+                                onChange={e => setKoerper(e.target.value)}
+                            />
+                        </Form.Group>
 
-            <Form.Group controlId="bewertung">
-                <Form.Label>Bewertung</Form.Label>
-                <div>
-                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
-                        <Form.Check
-                            inline
-                            type="radio"
-                            key={num}
-                            label={num}
-                            name="bewertung"
-                            value={num}
-                            onChange={e => setBewertung(parseInt(e.target.value, 10))}
-                        />
-                    ))}
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="suessse">
+                            <Form.Label className="data-block">Süsse</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={suessse}
+                                onChange={e => setSuessse(e.target.value)}
+                            />
+                        </Form.Group>
+                        <div className="detail-button-container">
+                            <Button className={`detail-button`} onClick={handleSubmit}>
+                                Bearbeitung speichern
+                            </Button>
+                            <Button variant="secondary" className="detail-button" onClick={navigateToDetailPage}>
+                                zurück
+                            </Button>
+                        </div>
+                        {errorMsg &&
+                            <div className="centered-alert">
+                                <Alert variant="danger">{errorMsg}</Alert>
+                            </div>
+                        }
+                        {successMsg &&
+                            <div className="centered-alert">
+                                <Alert variant="success">{successMsg}</Alert>
+                            </div>
+                        }
+                    </Form>
                 </div>
-            </Form.Group>
-
-            <Form.Group controlId="anmerkungen">
-                <Form.Label>Anmerkungen</Form.Label>
-                <Form.Control
-                    as="textarea"
-                    value={anmerkungen}
-                    onChange={e => setAnmerkungen(e.target.value)}
-                />
-            </Form.Group>
-
-            <Button onClick={handleSubmit}>Add</Button>
-            {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-            {successMsg && <Alert variant="success">{successMsg}</Alert>}
-        </Form>
+            </div>
+        </div>
     );
-
 }
 
-export default TastingForm;
+export default EditKaffeesorteForm;

@@ -82,7 +82,6 @@ function DetailseiteRoesterei() {
             <div className="kaffeesorten-list">
                 {kaffeesorten.map((kaffeesorte) => (
                     <div className="kaffeesorte-card" key={kaffeesorte.id}>
-                        {/* <BiSolidCoffeeBean className="coffee-icon" /> */}
                         <div className="kaffeesorte-details">
                             <h3>{kaffeesorte.kaffeesorteName}</h3>
                             <p>{kaffeesorte.roestereiName}</p>

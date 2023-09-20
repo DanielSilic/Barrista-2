@@ -76,7 +76,6 @@ function DetailseiteKaffeesorte () {
     const deleteKaffeesorte = () => {
         axios.delete(`/barista/kaffeesorte/${id}`)
             .then((response) => {
-                // Handle successful deletion here (e.g., redirect to another page)
                 console.log('Die Bohnen haben nun ausgebohnt:', response);
                 closeModal();
                 navigate(`/ListenseiteKaffeesorten/index`);
@@ -90,7 +89,9 @@ function DetailseiteKaffeesorte () {
     return (
         <div className="text-center">
             <Card style={{ width: '30rem', margin: '0 auto' }}>
-                <div className="image-container"></div>
+                <div className="image-container">
+                    <img src="/picture_for_coffee_detail_page.jpg" alt="Coffee Detail" className="coffee-image" />
+                </div>
                 <Card.Body>
                     <div className="kaffeesorte-header">
                         {kaffeesorte.kaffeesorteName}
