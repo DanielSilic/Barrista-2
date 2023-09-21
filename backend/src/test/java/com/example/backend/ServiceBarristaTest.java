@@ -30,7 +30,6 @@ public class ServiceBarristaTest {
         KaffeesorteRepo kaffeesorteRepo = Mockito.mock(KaffeesorteRepo.class);
         ServiceBarrista serviceBarrista = new ServiceBarrista (kaffeesorteRepo, null, null, null);
 
-        // Step 1
         Mockito.when(kaffeesorteRepo.findAll(Mockito.any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(
                         new Kaffeesorte("1", "KaffeesorteA", "RoestereiA", "VarietyA",
