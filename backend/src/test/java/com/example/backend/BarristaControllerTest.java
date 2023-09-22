@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 
@@ -239,30 +240,18 @@ public class BarristaControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.totalItems", Matchers.is(1)));
     }
 
-
-    //Tasting
-
-    @DirtiesContext
     @Test
+    @DirtiesContext
     @WithMockUser(username = "Dan", password = "123")
-    void filterTastings_shouldReturnFilteredTastings_basedOnParams() throws Exception {
-        Tasting tasting1 = new Tasting("123", "TastingA", "KaffeesorteA", "ZubereitungA", "MahlgradA",
-                "WassersorteA", "WassertemperaturA", "ErgebnisA", 5, "AnmerkungenA");
-        Tasting tasting2 = new Tasting("456", "TastingB", "KaffeesorteB", "ZubereitungB", "MahlgradB",
-                "WassersorteB", "WassertemperaturB", "ErgebnisB", 1, "AnmerkungenB");
-
-        tastingRepo.save(tasting1);
-        tastingRepo.save(tasting2);
-
-        mvc.perform(MockMvcRequestBuilders.get("/barista/tastings/filter")
-                        .param("zubereitungsmethodeName", "ZubereitungA")
-                        .param("bewertungFrontend", "mittel")
+    void getFilteredKaffeesorten_shouldReturnEmptyList_whenNoMatch() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorten/filter")
+                        .param("roestereiName", "NonExistentRoesterei")
+                        .param("aromenProfil", "nonExistentAromen")
                         .contentType(MediaType.APPLICATION_JSON))
+
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].tastingName", Matchers.is("TastingA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].zubereitungsmethodeName", Matchers.is("ZubereitungA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].bewertung", Matchers.is(5)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.kaffeesorten", Matchers.hasSize(0)))  // Expecting an empty list
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalItems", Matchers.is(0)));  // Expecting zero total items
     }
 
     @Test
@@ -293,6 +282,81 @@ public class BarristaControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.freezingDate", Matchers.is("FreezingDateA")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fotoUrlKaffeesorte", Matchers.is("FotoUrlKaffeesorteA")));
     }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "Dan", password = "123")
+    public void getAllKaffeesorteName_shouldReturnListOfNames() throws Exception {
+        Kaffeesorte kaffeesorteA = new Kaffeesorte("123", "KaffeesorteA", "RoestereiA", "VarietyA",
+                "AufbereitungA", "LandA", "AromenA", "AromenprofilA, blumig",
+                "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
+                "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
+        Kaffeesorte kaffeesorteB = new Kaffeesorte("456", "KaffeesorteB", "RoestereiB", "VarietyB",
+                "AufbereitungB", "LandB", "AromenB", "AromenprofilB, fruchtig",
+                "KoerperB", "SuesseB", "GeschmacksnotenHeissB", "GeschmacksnotenMediumB",
+                "GeschmacksnotenKaltB", "FreezingDateB", "FotoUrlKaffeesorteB");
+        kaffeesorteRepo.save(kaffeesorteA);
+        kaffeesorteRepo.save(kaffeesorteB);
+
+        mvc.perform(MockMvcRequestBuilders.get("/barista/dropdown/kaffeesortename")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0]").value(kaffeesorteB.getKaffeesorteName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1]").value(kaffeesorteA.getKaffeesorteName()));
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "Dan", password = "123")
+    public void getAllKaffeesortenByRoesterei_shouldReturnListOfKaffeesorte_whenRoestereiNameIsProvided() throws Exception {
+        String roestereiName = "RoestereiA";
+        Kaffeesorte kaffeesorteA = new Kaffeesorte("123", "KaffeesorteA", "RoestereiA", "VarietyA",
+                "AufbereitungA", "LandA", "AromenA", "AromenprofilA, blumig",
+                "KoerperA", "SuesseA", "GeschmacksnotenHeissA", "GeschmacksnotenMediumA",
+                "GeschmacksnotenKaltA", "FreezingDateA", "FotoUrlKaffeesorteA");
+        Kaffeesorte kaffeesorteB = new Kaffeesorte("456", "KaffeesorteB", "RoestereiB", "VarietyB",
+                "AufbereitungB", "LandB", "AromenB", "AromenprofilB, fruchtig",
+                "KoerperB", "SuesseB", "GeschmacksnotenHeissB", "GeschmacksnotenMediumB",
+                "GeschmacksnotenKaltB", "FreezingDateB", "FotoUrlKaffeesorteB");
+        kaffeesorteRepo.save(kaffeesorteA);
+        kaffeesorteRepo.save(kaffeesorteB);
+
+        mvc.perform(MockMvcRequestBuilders.get("/barista/kaffeesorte/nachroesterei")
+                        .param("roestereiName", roestereiName)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].roestereiName").value(roestereiName));
+    }
+
+
+
+    //Tasting
+
+    @DirtiesContext
+    @Test
+    @WithMockUser(username = "Dan", password = "123")
+    void filterTastings_shouldReturnFilteredTastings_basedOnParams() throws Exception {
+        Tasting tasting1 = new Tasting("123", "TastingA", "KaffeesorteA", "ZubereitungA", "MahlgradA",
+                "WassersorteA", "WassertemperaturA", "ErgebnisA", 5, "AnmerkungenA");
+        Tasting tasting2 = new Tasting("456", "TastingB", "KaffeesorteB", "ZubereitungB", "MahlgradB",
+                "WassersorteB", "WassertemperaturB", "ErgebnisB", 1, "AnmerkungenB");
+
+        tastingRepo.save(tasting1);
+        tastingRepo.save(tasting2);
+
+        mvc.perform(MockMvcRequestBuilders.get("/barista/tastings/filter")
+                        .param("zubereitungsmethodeName", "ZubereitungA")
+                        .param("bewertungFrontend", "mittel")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].tastingName", Matchers.is("TastingA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].zubereitungsmethodeName", Matchers.is("ZubereitungA")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.tastings[0].bewertung", Matchers.is(5)));
+    }
+
+
+
 
 
 }

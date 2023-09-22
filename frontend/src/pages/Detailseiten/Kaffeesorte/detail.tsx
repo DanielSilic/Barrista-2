@@ -118,7 +118,7 @@ function DetailseiteKaffeesorte () {
                         Koerper: <span className="subtitle-text">{kaffeesorte.koerper}</span>
                     </div>
                     <div className="card-indented-text">
-                        Suesse: <span className="subtitle-text">{kaffeesorte.suesse}</span>
+                        Süße: <span className="subtitle-text">{kaffeesorte.suesse}</span>
                     </div>
                     <div className="card-indented-text">
                         Geschmacksnoten Heiss: <span className="subtitle-text">{kaffeesorte.geschmacksnotenHeiss}</span>

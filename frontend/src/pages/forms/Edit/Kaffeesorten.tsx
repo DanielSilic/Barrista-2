@@ -8,7 +8,6 @@ function EditKaffeesorteForm() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-
     const [kaffeesorteName, setKaffeesorteName] = useState<string>('');
     const [roestereiNames, setRoestereiNames] = useState<string[]>([]);
     const [selectedRoestereiName, setSelectedRoestereiName] = useState<string>('');
@@ -19,7 +18,7 @@ function EditKaffeesorteForm() {
 
     const [aromen, setAromen] = useState<string>('');
     const [koerper, setKoerper] = useState<string>('');
-    const [suessse, setSuessse] = useState<string>('');
+    const [suesse, setSuesse] = useState<string>('');
     const [geschmacksnotenHeiss, setGeschmacksnotenHeiss] = useState<string>('');
     const [geschmacksnotenMedium, setGeschmacksnotenMedium] = useState<string>('');
     const [geschmacksnotenKalt, setGeschmacksnotenKalt] = useState<string>('');
@@ -49,7 +48,7 @@ function EditKaffeesorteForm() {
                 setAromenProfil(kaffeesorteData.aromenProfil);
                 setAromen(kaffeesorteData.aromen);
                 setKoerper(kaffeesorteData.koerper);
-                setSuessse(kaffeesorteData.suessse);
+                setSuesse(kaffeesorteData.suesse);
                 setGeschmacksnotenHeiss(kaffeesorteData.geschmacksnotenHeiss);
                 setGeschmacksnotenMedium(kaffeesorteData.geschmacksnotenMedium);
                 setGeschmacksnotenKalt(kaffeesorteData.geschmacksnotenKalt);
@@ -81,7 +80,7 @@ function EditKaffeesorteForm() {
             aromenProfil,
             aromen,
             koerper,
-            suessse,
+            suesse,
             geschmacksnotenHeiss,
             geschmacksnotenMedium,
             geschmacksnotenKalt,
@@ -189,15 +188,56 @@ function EditKaffeesorteForm() {
                             />
                         </Form.Group>
 
-                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="suessse">
-                            <Form.Label className="data-block">Süsse</Form.Label>
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="suesse">
+                            <Form.Label className="data-block">Süße</Form.Label>
                             <Form.Control
                                 className="fixed-width-control"
                                 type="text"
-                                value={suessse}
-                                onChange={e => setSuessse(e.target.value)}
+                                value={suesse}
+                                onChange={e => setSuesse(e.target.value)}
                             />
                         </Form.Group>
+
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="geschmacksnotenHeiss">
+                            <Form.Label className="data-block">Geschmacksnoten (Heiss)</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={geschmacksnotenHeiss}
+                                onChange={e => setGeschmacksnotenHeiss(e.target.value)}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="geschmacksnotenMedium">
+                            <Form.Label className="data-block">Geschmacksnoten (Medium)</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={geschmacksnotenMedium}
+                                onChange={e => setGeschmacksnotenMedium(e.target.value)}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="geschmacksnotenKalt">
+                            <Form.Label className="data-block">Geschmacksnoten (Kalt)</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={geschmacksnotenKalt}
+                                onChange={e => setGeschmacksnotenKalt(e.target.value)}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="formgroup-add-kaffee-kombi" controlId="freezingDate">
+                            <Form.Label className="data-block">Freezing Date</Form.Label>
+                            <Form.Control
+                                className="fixed-width-control"
+                                type="text"
+                                value={freezingDate}
+                                onChange={e => setFreezingDate(e.target.value)}
+                            />
+                        </Form.Group>
+
                         <div className="detail-button-container">
                             <Button className={`detail-button`} onClick={handleSubmit}>
                                 Bearbeitung speichern
@@ -222,5 +262,4 @@ function EditKaffeesorteForm() {
         </div>
     );
 }
-
 export default EditKaffeesorteForm;

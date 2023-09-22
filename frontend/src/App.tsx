@@ -1,5 +1,4 @@
 import "./index.css";
-import Homepage from './pages/Homepage';
 import ListenseiteKaffeesorten from './pages/ListenseiteKaffeesorten';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AddKaffeesorteForm from "./pages/forms/Add/Kaffeesorten.tsx";
@@ -13,26 +12,25 @@ import DetailseiteRoesterei from "./pages/Detailseiten/Roesterei/detail.tsx";
 import EditKaffeesorteForm from "./pages/forms/Edit/Kaffeesorten.tsx";
 import EditTastingForm from "./pages/forms/Edit/Tastings.tsx";
 import Header from "./Header/Header.tsx";
-import ProtectedRoute from "./ProtectedRoutes.tsx";
+import ProtectedRoute from "./assets/ProtectedRoutes.tsx";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import { useState } from "react";
 import ScrollToTop from './assets/ScrollToTop.tsx';
-import MainLayout from "./assets/MainLayout.tsx";
+import Homepage from "./pages/Homepage";
 
 function App() {
     const [user, setUser] = useState("")
 
     return (
         <Router>
-            <Header />
+            {user && <Header />}
             <ScrollToTop>
-            <Routes>
-                <Route path="/" element={<LoginPage setUser={setUser} />} />
-                <Route path="/register" element={<RegisterPage />} />
+                <Routes>
+                    <Route path="/" element={<LoginPage setUser={setUser} />} />
+                    <Route path="/register" element={<RegisterPage />} />
                     <Route element={<ProtectedRoute user={user} />}>
                         <Route path="/home" element={<Homepage />} />
-                        <Route path="/test" element={<MainLayout />} />
                         <Route path="/ListenseiteKaffeesorten/index" element={<ListenseiteKaffeesorten />} />
                         <Route path="/ListenseiteTastings/index" element={<TastingListe />} />
                         <Route path="/ListenseiteZubereitungsmethoden/index" element={<ListenseiteZM />} />
@@ -45,7 +43,7 @@ function App() {
                         <Route path="/Detailseiten/Tasting/detail/:id" element={<DetailseiteTasting />} />
                         <Route path="/Detailseiten/Roesterei/detail/:roestereiName" element={<DetailseiteRoesterei />} />
                     </Route>
-            </Routes>
+                </Routes>
             </ScrollToTop>
         </Router>
     );
